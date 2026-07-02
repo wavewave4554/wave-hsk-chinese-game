@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover">
+<title>Wave · เกมภาษาจีน</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1D9E75">
+<link rel="icon" href="favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wave เรียนจีน">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+body{font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;background:#f5f4f0;min-height:100vh;padding:16px 16px 90px}
+.app{max-width:480px;margin:0 auto}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:8px}
+.hdr-left{display:flex;align-items:center;gap:8px;min-width:0}
+.back-btn{background:white;border:1.5px solid #e0ddd6;border-radius:10px;width:34px;height:34px;font-size:16px;cursor:pointer;flex:none;display:inline-flex;align-items:center;justify-content:center}
+.logo{font-size:14px;font-weight:600;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-right{display:flex;gap:6px;flex:none}
+.streak-pill{background:#FAEEDA;color:#854F0B;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px}
+.level-pill{background:#111;color:white;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px}
+
+.view{display:none}
+.view.active{display:block}
+
+/* HOME */
+.xp-card{background:white;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.xp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.xp-top #lvl-label{font-size:15px;font-weight:700;color:#111}
+.xp-top #xp-label{font-size:12px;color:#888}
+.xp-bar-wrap{background:#e8e6e0;border-radius:6px;height:8px;overflow:hidden}
+.xp-bar-fill{height:8px;background:linear-gradient(90deg,#1D9E75,#0F6E56);border-radius:6px;transition:width .4s}
+
+.today-card{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.today-stat{background:white;border-radius:12px;padding:12px 6px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.today-n{font-size:20px;font-weight:700;color:#111}
+.today-l{font-size:10px;color:#888;margin-top:2px}
+
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.mode-card{background:white;border-radius:16px;padding:16px 12px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.05);cursor:pointer;border:1.5px solid transparent}
+.mode-card:active{transform:scale(.97)}
+.mode-icon{font-size:26px;margin-bottom:6px}
+.mode-title{font-size:13px;font-weight:700;color:#111;margin-bottom:2px}
+.mode-sub{font-size:10px;color:#999;line-height:1.4}
+
+.board-section{margin-bottom:10px}
+.board-title{font-size:12px;font-weight:700;color:#666;margin-bottom:8px;letter-spacing:.02em}
+.board-row{display:flex;align-items:center;gap:10px;background:white;border-radius:12px;padding:9px 12px;margin-bottom:6px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.board-row.locked{opacity:.55}
+.board-emoji{font-size:17px;flex:none;width:22px;text-align:center}
+.board-info{flex:1;min-width:0}
+.board-name{font-size:11.5px;font-weight:600;color:#333;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.board-bar-wrap{background:#eee;border-radius:4px;height:5px;overflow:hidden}
+.board-bar-fill{height:5px;border-radius:4px;transition:width .4s}
+.board-pct{font-size:11px;font-weight:700;color:#888;flex:none;width:34px;text-align:right}
+
+/* SHARED: scope/cat pickers */
+.section-card{background:white;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.scope-tabs{display:flex;gap:6px;margin-bottom:10px}
+.sctab{flex:1;text-align:center;padding:9px 6px;border-radius:10px;border:1.5px solid #ddd;background:white;font-size:12px;font-weight:600;color:#666;cursor:pointer}
+.sctab.on{background:#534AB7;color:white;border-color:#534AB7}
+.cat-picker{display:none}
+.cat-picker.show{display:block}
+.cat-label{font-size:11px;color:#888;margin-bottom:6px;letter-spacing:.04em}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:180px;overflow-y:auto;padding:2px}
+.cat-chip{background:white;border:1.5px solid #e0ddd6;border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;font-size:10px;font-weight:500;color:#555}
+.cat-chip.on{border-width:2px}
+.cat-chip.locked{color:#bbb;cursor:not-allowed}
+.cat-emoji{font-size:16px;display:block;margin-bottom:2px}
+.status-tabs{display:flex;gap:5px;margin-top:10px}
+.fstab{flex:1;text-align:center;font-size:11px;padding:7px 4px;border-radius:8px;border:1.5px solid #ddd;background:white;color:#666;cursor:pointer;font-weight:500}
+.fstab.on{background:#111;color:white;border-color:#111}
+.start-btn{background:#111;color:white;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:2px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}
+.sc{background:white;border-radius:10px;padding:9px 6px;text-align:center}
+.sv{font-size:17px;font-weight:700;color:#111}
+.sl{font-size:9.5px;color:#888;margin-top:1px}
+.sv.gray{color:#888}.sv.red{color:#E24B4A}.sv.green{color:#1D9E75}
+.prog-wrap{background:#e8e6e0;border-radius:4px;height:5px;margin-bottom:14px;overflow:hidden}
+.prog-fill{height:5px;background:#1D9E75;border-radius:4px;transition:width .4s}
+
+/* FLASHCARD (learn) */
+.card-wrap{margin-bottom:14px}
+.lcard{background:white;border-radius:20px;padding:26px 20px;box-shadow:0 2px 16px rgba(0,0,0,.07);text-align:center;position:relative;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cat-pill{position:absolute;top:12px;left:12px;font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600;background:#f5f4f0;color:#888}
+.status-pill{position:absolute;top:12px;right:12px;font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600}
+.sp-new{background:#FAEEDA;color:#854F0B}
+.sp-no{background:#fef5f5;color:#E24B4A}
+.sp-yes{background:#E1F5EE;color:#0F6E56}
+.tts-btn{background:#f5f4f0;border:none;color:#111;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:10px;font-size:16px}
+.card-hanzi{font-size:52px;font-weight:400;color:#111;margin-bottom:4px;line-height:1}
+.card-pinyin{font-size:16px;color:#185FA5;margin-bottom:10px;font-style:italic}
+.card-meaning{font-size:16px;color:#333;margin-bottom:10px;text-align:center;font-weight:600}
+.card-example{font-size:12px;color:#888;text-align:center;line-height:1.6;padding:0 6px}
+.status-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.status-btn{border:none;border-radius:11px;padding:12px 4px;font-size:12px;font-weight:600;cursor:pointer}
+.sb-no{background:#fef5f5;color:#E24B4A}
+.sb-half{background:#FAEEDA;color:#854F0B}
+.sb-yes{background:#E1F5EE;color:#0F6E56}
+.nav-row{display:flex;align-items:center;justify-content:space-between}
+.nav-btn{background:white;border:1.5px solid #e0ddd6;color:#444;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer}
+.nav-idx{font-size:13px;color:#888}
+
+/* QUIZ */
+.quiz-prompt{background:white;border-radius:20px;padding:26px 20px;box-shadow:0 2px 16px rgba(0,0,0,.07);text-align:center;margin-bottom:14px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.quiz-hanzi{font-size:46px;color:#111;margin-bottom:8px}
+.quiz-pinyin{font-size:15px;color:#185FA5;font-style:italic;margin-bottom:4px}
+.quiz-meaning-prompt{font-size:20px;font-weight:700;color:#111}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.quiz-opt{background:white;border:1.5px solid #e0ddd6;border-radius:14px;padding:14px 8px;font-size:13.5px;text-align:center;cursor:pointer;min-height:56px;display:flex;align-items:center;justify-content:center;line-height:1.4}
+.quiz-opt.correct{background:#E1F5EE;border-color:#0F6E56;color:#0F6E56;font-weight:700}
+.quiz-opt.wrong{background:#fef5f5;border-color:#E24B4A;color:#E24B4A;font-weight:700}
+.quiz-opt.disabled{pointer-events:none}
+.next-btn{background:#111;color:white;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;width:100%}
+
+/* MATCH */
+.match-timer{text-align:center;font-size:22px;font-weight:700;color:#111;margin-bottom:10px}
+.match-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.match-card{aspect-ratio:1/1;background:#111;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;text-align:center;padding:4px;cursor:pointer;line-height:1.25;font-weight:600}
+.match-card.flipped{background:white;color:#111;border:1.5px solid #185FA5}
+.match-card.matched{background:#E1F5EE;color:#0F6E56;border:1.5px solid #0F6E56;cursor:default}
+.match-card.hidden-text{font-size:20px}
+
+/* DICTATION */
+.dt-card{background:white;border-radius:20px;padding:26px 20px;margin-bottom:14px;box-shadow:0 2px 16px rgba(0,0,0,.06);text-align:center;position:relative}
+.dt-round-lbl{font-size:11px;color:#aaa;margin-bottom:14px;letter-spacing:.04em}
+.dt-meaning-big{font-size:22px;font-weight:700;color:#111;margin-bottom:16px}
+.dt-play-big{width:88px;height:88px;border-radius:50%;background:#1D9E75;border:none;color:white;font-size:34px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(29,158,117,.3);margin-bottom:14px}
+.dt-play-big.playing{background:#185FA5;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px rgba(24,95,165,.25)}50%{box-shadow:0 4px 24px rgba(24,95,165,.5)}}
+.dt-instruct{font-size:12.5px;color:#666;line-height:1.6;margin-bottom:16px}
+.spd-row{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
+.spd-btn{font-size:11px;padding:5px 12px;border-radius:20px;border:1.5px solid #ddd;background:white;color:#666;cursor:pointer}
+.spd-btn.on{background:#1D9E75;color:white;border-color:#1D9E75}
+.dt-reveal-btn{background:#111;color:white;border:none;border-radius:14px;padding:14px 24px;font-size:15px;font-weight:600;cursor:pointer;width:100%}
+.dt-back{display:none}
+.rv-hanzi{font-size:56px;font-weight:400;color:#111;line-height:1;margin-bottom:6px;font-family:"Noto Sans SC",sans-serif}
+.rv-pinyin{font-size:17px;color:#185FA5;font-style:italic;margin-bottom:8px}
+.rv-th{font-size:15px;color:#444;margin-bottom:14px;font-weight:600}
+.rv-divider{height:.5px;background:#f0efe9;margin:0 -20px 14px}
+.rv-ans-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rv-btn{border:none;border-radius:14px;padding:14px 10px;font-size:13px;font-weight:600;cursor:pointer}
+.rv-correct{background:#E1F5EE;color:#0F6E56}
+.rv-wrong{background:#FAEEDA;color:#854F0B}
+
+/* LISTEN */
+.listen-card{background:white;border-radius:20px;padding:24px 20px;box-shadow:0 2px 16px rgba(0,0,0,.06);text-align:center;margin-bottom:14px}
+.listen-lbl{font-size:11px;color:#aaa;margin-bottom:14px;letter-spacing:.04em}
+.replay-info{font-size:11px;color:#999;margin-top:6px}
+.level-tabs{display:flex;gap:6px;margin-bottom:12px}
+.lvltab{flex:1;text-align:center;padding:9px 4px;border-radius:10px;border:1.5px solid #ddd;background:white;font-size:12px;font-weight:600;color:#666;cursor:pointer}
+.lvltab.on{background:#185FA5;color:white;border-color:#185FA5}
+.listen-options{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.listen-opt{background:white;border:1.5px solid #e0ddd6;border-radius:12px;padding:13px 12px;font-size:14px;text-align:left;cursor:pointer}
+.listen-opt.correct{background:#E1F5EE;border-color:#0F6E56;color:#0F6E56;font-weight:700}
+.listen-opt.wrong{background:#fef5f5;border-color:#E24B4A;color:#E24B4A;font-weight:700}
+.listen-opt.disabled{pointer-events:none}
+
+/* ARRANGE */
+.arr-hint{background:white;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.05);text-align:center}
+.arr-hint-meaning{font-size:16px;font-weight:700;color:#111;margin-bottom:8px}
+.tile-label{font-size:11px;color:#999;margin-bottom:6px;letter-spacing:.04em}
+.tile-answer{display:flex;flex-wrap:wrap;gap:8px;min-height:56px;padding:10px;border-radius:14px;background:#fbfaf7;border:1.5px dashed #ccc;margin-bottom:14px;align-content:flex-start}
+.tile-bank{display:flex;flex-wrap:wrap;gap:8px;min-height:50px;padding:10px;border-radius:14px;background:white;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.tile{background:#111;color:white;padding:9px 15px;border-radius:9px;font-size:19px;cursor:pointer;font-family:"Noto Sans SC",sans-serif}
+.tile.answered-correct{background:#0F6E56}
+.tile.answered-wrong{background:#E24B4A}
+.arr-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.arr-btn{border:none;border-radius:14px;padding:13px;font-size:13px;font-weight:600;cursor:pointer}
+.arr-check{background:#111;color:white}
+.arr-clear{background:white;color:#666;border:1.5px solid #e0ddd6!important}
+.arr-reveal{margin-top:6px;font-size:13px;color:#888;text-align:center;background:#f5f4f0;border-radius:10px;padding:10px}
+.arr-reveal b{color:#111;font-size:17px;font-family:"Noto Sans SC",sans-serif}
+
+/* shared bits */
+.mode-hdr-note{font-size:12px;color:#888;margin-bottom:12px;line-height:1.6}
+
+/* DONE OVERLAY */
+.done-overlay{display:none;position:fixed;inset:0;background:rgba(20,18,15,.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.done-card{background:white;border-radius:22px;padding:28px 22px;text-align:center;max-width:360px;width:100%}
+.done-card h2{font-size:21px;font-weight:700;margin-bottom:6px}
+.done-card p{font-size:13px;color:#888;margin-bottom:18px}
+.done-stats2{display:flex;gap:8px;margin-bottom:20px}
+.ds2{flex:1;background:#f5f4f0;border-radius:10px;padding:13px 6px;text-align:center}
+.ds2-n{font-size:20px;font-weight:700;color:#111}
+.ds2-l{font-size:9.5px;color:#888;margin-top:2px}
+.done-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.done-btns button{border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:600;cursor:pointer}
+.done-btns button:first-child{background:#111;color:white}
+.done-btns button:last-child{background:#f0efe9;color:#444}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:white;padding:11px 20px;border-radius:30px;font-size:12.5px;box-shadow:0 6px 24px rgba(0,0,0,.25);z-index:1100;opacity:0;pointer-events:none;transition:opacity .3s,bottom .3s;max-width:90%;text-align:center}
+.toast.show{opacity:1;bottom:36px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-left">
+      <button class="back-btn" id="btn-back" onclick="goHome()" style="display:none">←</button>
+      <span class="logo" id="view-title">Wave · เรียนจีน</span>
+    </div>
+    <div class="hdr-right">
+      <span class="streak-pill" id="streak-pill">🔥0</span>
+      <span class="level-pill" id="level-pill">Lv.1</span>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="view active" id="view-home">
+    <div class="xp-card">
+      <div class="xp-top"><span id="lvl-label">Level 1</span><span id="xp-label">0 / 100 XP</span></div>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
+    </div>
+    <div class="today-card">
+      <div class="today-stat"><div class="today-n" id="today-learned">0</div><div class="today-l">จำได้วันนี้</div></div>
+      <div class="today-stat"><div class="today-n" id="today-xp">0</div><div class="today-l">XP วันนี้</div></div>
+      <div class="today-stat"><div class="today-n" id="today-streak">0</div><div class="today-l">🔥 วันติดกัน</div></div>
+    </div>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="openMode('learn')"><div class="mode-icon">📖</div><div class="mode-title">เรียนคำใหม่</div><div class="mode-sub">HSK2 ทีละคำ</div></div>
+      <div class="mode-card" onclick="openMode('quiz')"><div class="mode-icon">📝</div><div class="mode-title">Quiz 4 ตัวเลือก</div><div class="mode-sub">HSK2 ตามหมวด</div></div>
+      <div class="mode-card" onclick="openMode('match')"><div class="mode-icon">🃏</div><div class="mode-title">จับคู่การ์ด</div><div class="mode-sub">จับเวลา</div></div>
+      <div class="mode-card" onclick="openMode('dictate')"><div class="mode-icon">🎧</div><div class="mode-title">เขียนตามคำบอก</div><div class="mode-sub">ฟัง+เขียน</div></div>
+      <div class="mode-card" onclick="openMode('listen')"><div class="mode-icon">👂</div><div class="mode-title">ฟังประโยค</div><div class="mode-sub">HSK1+2 · 3 ระดับ</div></div>
+      <div class="mode-card" onclick="openMode('arrange')"><div class="mode-icon">🔤</div><div class="mode-title">เรียงประโยค</div><div class="mode-sub">HSK1+2 ผสม</div></div>
+    </div>
+    <div class="board-section">
+      <div class="board-title">ความคืบหน้ารายหมวด (HSK2 · 18 หมวด)</div>
+      <div id="cat-board"></div>
+    </div>
+  </div>
+
+  <!-- LEARN -->
+  <div class="view" id="view-learn">
+    <div class="section-card">
+      <div class="scope-tabs">
+        <div class="sctab" id="learn-sc-all" onclick="learnSetScope('all')">🌐 ทุกหมวดที่ปลดล็อก</div>
+        <div class="sctab" id="learn-sc-cat" onclick="learnSetScope('cat')">🗂 แยกตามหมวด</div>
+      </div>
+      <div class="cat-picker" id="learn-cat-picker"><div class="cat-label">เลือกหมวด</div><div class="cat-grid" id="learn-cat-grid"></div></div>
+      <div class="status-tabs" id="learn-status-tabs"></div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="sv gray" id="learn-s-new">0</div><div class="sl">ยังไม่เรียน</div></div>
+      <div class="sc"><div class="sv red" id="learn-s-no">0</div><div class="sl">จำไม่ได้</div></div>
+      <div class="sc"><div class="sv green" id="learn-s-yes">0</div><div class="sl">จำได้แล้ว</div></div>
+      <div class="sc"><div class="sv" id="learn-s-pct">0%</div><div class="sl">ความคืบหน้า</div></div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="learn-prog" style="width:0%"></div></div>
+    <div class="card-wrap">
+      <div class="lcard" id="learn-card">
+        <div class="cat-pill" id="learn-cat-pill"></div>
+        <div class="status-pill" id="learn-status-pill"></div>
+        <button class="tts-btn" onclick="learnSpeak(event)">🔊</button>
+        <div class="card-hanzi" id="learn-hanzi"></div>
+        <div class="card-pinyin" id="learn-pinyin"></div>
+        <div class="card-meaning" id="learn-meaning"></div>
+        <div class="card-example" id="learn-example"></div>
+      </div>
+    </div>
+    <div class="status-row">
+      <button class="status-btn sb-no" onclick="learnSetStatus(1)">❌ จำไม่ได้</button>
+      <button class="status-btn sb-half" onclick="learnSetStatus(2)">🤔 ยังไม่แน่น</button>
+      <button class="status-btn sb-yes" onclick="learnSetStatus(3)">✅ จำได้แล้ว</button>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="learnPrev()">← ก่อน</button>
+      <span class="nav-idx" id="learn-idx">1 / 1</span>
+      <button class="nav-btn" onclick="learnNext()">ถัดไป →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="view" id="view-quiz">
+    <div class="section-card" id="quiz-setup">
+      <div class="scope-tabs">
+        <div class="sctab" id="quiz-sc-all" onclick="quizSetScope('all')">🌐 ทุกหมวดที่ปลดล็อก</div>
+        <div class="sctab" id="quiz-sc-cat" onclick="quizSetScope('cat')">🗂 แยกตามหมวด</div>
+      </div>
+      <div class="cat-picker" id="quiz-cat-picker"><div class="cat-label">เลือกหมวด</div><div class="cat-grid" id="quiz-cat-grid"></div></div>
+      <button class="start-btn" onclick="startQuiz()">เริ่ม Quiz ▶</button>
+    </div>
+    <div id="quiz-play" style="display:none">
+      <div class="nav-idx" id="quiz-idx" style="display:block;text-align:center;margin-bottom:10px">ข้อ 1 / 10</div>
+      <div class="quiz-prompt" id="quiz-prompt-box"></div>
+      <div class="quiz-options" id="quiz-options"></div>
+      <button class="next-btn" id="quiz-next-btn" style="display:none" onclick="quizNext()">ถัดไป →</button>
+    </div>
+  </div>
+
+  <!-- MATCH -->
+  <div class="view" id="view-match">
+    <div class="section-card" id="match-setup">
+      <div class="cat-label">เลือกหมวด (HSK2)</div>
+      <div class="cat-grid" id="match-cat-grid" style="margin-bottom:12px"></div>
+      <button class="start-btn" onclick="startMatch()">เริ่มจับคู่ ▶</button>
+    </div>
+    <div id="match-play" style="display:none">
+      <div class="match-timer" id="match-timer">00:00</div>
+      <div class="match-grid" id="match-grid"></div>
+    </div>
+  </div>
+
+  <!-- DICTATE -->
+  <div class="view" id="view-dictate">
+    <div class="section-card" id="dictate-setup">
+      <div class="scope-tabs">
+        <div class="sctab" id="dictate-sc-all" onclick="dictateSetScope('all')">🌐 ทุกหมวดที่ปลดล็อก</div>
+        <div class="sctab" id="dictate-sc-cat" onclick="dictateSetScope('cat')">🗂 แยกตามหมวด</div>
+      </div>
+      <div class="cat-picker" id="dictate-cat-picker"><div class="cat-label">เลือกหมวด</div><div class="cat-grid" id="dictate-cat-grid"></div></div>
+      <button class="start-btn" onclick="startDictate()">เริ่มเขียนตามคำบอก ▶</button>
+    </div>
+    <div id="dictate-play" style="display:none">
+      <div class="dt-card" id="dt-card">
+        <div id="dt-front">
+          <div class="cat-pill" id="dt-cat-pill"></div>
+          <div class="dt-round-lbl" id="dt-round-lbl">ข้อ 1 / 10</div>
+          <div class="dt-meaning-big" id="dt-meaning-big"></div>
+          <button class="dt-play-big" id="dt-play-btn" onclick="dtPlay()">🔊</button>
+          <div class="dt-instruct">กดฟังเสียง แล้ว<strong> เขียนตัวอักษรจีนลงกระดาษ</strong></div>
+          <div class="spd-row">
+            <button class="spd-btn on" onclick="dtSetSpd(0.7,this)">ช้า</button>
+            <button class="spd-btn" onclick="dtSetSpd(1.0,this)">ปกติ</button>
+            <button class="spd-btn" onclick="dtSetSpd(1.3,this)">เร็ว</button>
+          </div>
+          <button class="dt-reveal-btn" onclick="dtReveal()">ดูเฉลย →</button>
+        </div>
+        <div class="dt-back" id="dt-back">
+          <div class="dt-round-lbl" id="dt-round-lbl2">ข้อ 1 / 10</div>
+          <div class="rv-hanzi" id="rv-hanzi"></div>
+          <div class="rv-pinyin" id="rv-pinyin"></div>
+          <div class="rv-th" id="rv-th"></div>
+          <div class="rv-divider"></div>
+          <div style="font-size:12px;color:#888;margin-bottom:12px">เขียนถูกไหม?</div>
+          <div class="rv-ans-row">
+            <button class="rv-btn rv-correct" onclick="dtAnswer(true)">✓ เขียนถูก</button>
+            <button class="rv-btn rv-wrong" onclick="dtAnswer(false)">✗ เขียนผิด</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTEN -->
+  <div class="view" id="view-listen">
+    <div class="section-card" id="listen-setup">
+      <div class="mode-hdr-note">ฟังประโยคภาษาจีน (คำศัพท์ HSK1+HSK2 ผสม) แล้วเลือกความหมายของคำที่ประโยคพูดถึง</div>
+      <div class="level-tabs">
+        <div class="lvltab on" id="lvl-1" onclick="listenSetLevel(1,this)">🟢 ง่าย</div>
+        <div class="lvltab" id="lvl-2" onclick="listenSetLevel(2,this)">🟡 ปานกลาง</div>
+        <div class="lvltab" id="lvl-3" onclick="listenSetLevel(3,this)">🔴 ยาก</div>
+      </div>
+      <button class="start-btn" onclick="startListen()">เริ่มฟัง ▶</button>
+    </div>
+    <div id="listen-play" style="display:none">
+      <div class="listen-card">
+        <div class="listen-lbl" id="listen-round-lbl">ข้อ 1 / 10</div>
+        <button class="dt-play-big" id="listen-play-btn" onclick="listenPlay()">🔊</button>
+        <div class="dt-instruct">ประโยคนี้พูดถึงคำว่าอะไร?</div>
+        <div class="replay-info" id="listen-replay-info"></div>
+      </div>
+      <div class="listen-options" id="listen-options"></div>
+      <button class="next-btn" id="listen-next-btn" style="display:none" onclick="listenNext()">ถัดไป →</button>
+    </div>
+  </div>
+
+  <!-- ARRANGE -->
+  <div class="view" id="view-arrange">
+    <div class="section-card" id="arrange-setup">
+      <div class="mode-hdr-note">เรียงคำภาษาจีน (จากคำศัพท์ HSK1+HSK2) ให้เป็นประโยคที่ถูกต้อง</div>
+      <button class="start-btn" onclick="startArrange()">เริ่มเรียงประโยค ▶</button>
+    </div>
+    <div id="arrange-play" style="display:none">
+      <div class="listen-lbl" id="arr-round-lbl" style="text-align:center;margin-bottom:10px">ข้อ 1 / 8</div>
+      <div class="arr-hint">
+        <div class="arr-hint-meaning" id="arr-meaning"></div>
+        <button class="tts-btn" style="background:#f5f4f0" onclick="arrSpeak()">🔊 ฟังประโยค</button>
+      </div>
+      <div class="tile-label">คำตอบของคุณ (แตะเพื่อลบ)</div>
+      <div class="tile-answer" id="tile-answer"></div>
+      <div class="tile-label">คำที่ใช้ได้ (แตะเพื่อเพิ่ม)</div>
+      <div class="tile-bank" id="tile-bank"></div>
+      <div class="arr-btn-row">
+        <button class="arr-btn arr-clear" onclick="arrClear()">ล้าง</button>
+        <button class="arr-btn arr-check" onclick="arrCheck()">ตรวจคำตอบ ✓</button>
+      </div>
+      <div class="arr-reveal" id="arr-reveal" style="display:none"></div>
+      <button class="next-btn" id="arr-next-btn" style="display:none;margin-top:10px" onclick="arrNext()">ถัดไป →</button>
+    </div>
+  </div>
+</div>
+
+<div class="done-overlay" id="done-overlay">
+  <div class="done-card">
+    <h2 id="done-title2">🎉</h2>
+    <p id="done-sub2"></p>
+    <div class="done-stats2" id="done-stats2"></div>
+    <div class="done-btns"><button onclick="doneRestart()">เล่นอีกครั้ง</button><button onclick="goHome()">กลับหน้าหลัก</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+var HSK1_RAW = [{"name":"ตัวเลข 0–10","emoji":"🔢","color":"#1D9E75","words":[{"h":"零","p":"líng","t":"ศูนย์","e":"今年是二零一二年。","id":57},{"h":"一","p":"yī","t":"หนึ่ง","e":"这儿一个人都没有。","id":130},{"h":"八","p":"bā","t":"แปด","e":"他儿子今年八岁了。","id":2},{"h":"三","p":"sān","t":"สาม","e":"我有三本书。","id":86},{"h":"四","p":"sì","t":"สี่","e":"我们四个人去看电影。","id":102},{"h":"五","p":"wǔ","t":"ห้า","e":"今天星期五。","id":113},{"h":"六","p":"liù","t":"หก","e":"桌子上有六个杯子。","id":58},{"h":"七","p":"qī","t":"เจ็ด","e":"一个星期有七天。","id":78},{"h":"九","p":"jiǔ","t":"เก้า","e":"今天是八月九日。","id":47},{"h":"十","p":"shí","t":"สิบ","e":"现在是十月。","id":93},{"h":"二","p":"èr","t":"สอง","e":"现在十二点了。","id":27}]},{"name":"เวลาในแต่ละวัน","emoji":"🕐","color":"#185FA5","words":[{"h":"上午","p":"shàngwǔ","t":"ช่วงเช้า","e":"现在是上午10点。","id":89},{"h":"下午","p":"xiàwǔ","t":"ช่วงบ่าย","e":"我今天下午不去学校了。","id":116},{"h":"中午","p":"zhōngwǔ","t":"ตอนกลางวัน","e":"我今天中午去火车站。","id":144},{"h":"现在","p":"xiànzài","t":"ตอนนี้","e":"现在是12点。","id":119},{"h":"点","p":"diǎn","t":"โมง","e":"现在是下午3点20。","id":16},{"h":"下雨","p":"xià yǔ","t":"ฝนตก","e":"昨天下雨了。","id":117}]},{"name":"วันที่ & ปฏิทิน","emoji":"📅","color":"#854F0B","words":[{"h":"今天","p":"jīntiān","t":"วันนี้","e":"我今天去北京。","id":46},{"h":"明天","p":"míngtiān","t":"พรุ่งนี้","e":"今天星期日，明天是星期一。","id":65},{"h":"昨天","p":"zuótiān","t":"เมื่อวาน","e":"他昨天没去学校。","id":148},{"h":"星期","p":"xīngqī","t":"สัปดาห์","e":"一个星期有七天。","id":126},{"h":"月","p":"yuè","t":"เดือน","e":"一年有12个月。","id":137},{"h":"年","p":"nián","t":"ปี","e":"我在中国住了三年。","id":73},{"h":"号","p":"hào","t":"วันที่","e":"今天是2002年1月1号。","id":36},{"h":"时候","p":"shíhou","t":"ตอนที่","e":"我回家的时候，他在睡觉。","id":94}]},{"name":"ครอบครัว","emoji":"👨‍👩‍👧","color":"#534AB7","words":[{"h":"爸爸","p":"bàba","t":"พ่อ","e":"我爸爸是医生。","id":3},{"h":"妈妈","p":"māma","t":"แม่","e":"我妈妈不在家。","id":59},{"h":"儿子","p":"érzi","t":"ลูกชาย","e":"我儿子三岁了。","id":26},{"h":"女儿","p":"nǚ'ér","t":"ลูกสาว","e":"我有两个女儿。","id":74}]},{"name":"สรรพนาม บุคคล","emoji":"🙋","color":"#993C1D","words":[{"h":"我","p":"wǒ","t":"ฉัน, ผม","e":"我是一个学生。","id":111},{"h":"你","p":"nǐ","t":"คุณ, เธอ","e":"你认识这个人吗？","id":72},{"h":"他","p":"tā","t":"เขา (ผู้ชาย)","e":"他是我们的老师。","id":104},{"h":"她","p":"tā","t":"เขา (ผู้หญิง)","e":"我认识她的妈妈。","id":105},{"h":"我们","p":"wǒmen","t":"พวกเรา","e":"我们都是学生。","id":112},{"h":"那","p":"nà","t":"นั้น, ที่นั้น","e":"我不认识那个人。","id":69},{"h":"这","p":"zhè","t":"นี่, ที่นี่","e":"这个人是我的同学。","id":142},{"h":"哪","p":"nǎ","t":"ไหน","e":"哪个杯子是你的？","id":67},{"h":"哪儿","p":"nǎr","t":"ที่ไหน","e":"你家在哪儿？","id":68}]},{"name":"คำถาม","emoji":"❓","color":"#3B6D11","words":[{"h":"几","p":"jǐ","t":"กี่, เท่าไหร่","e":"你有几个儿子？","id":43},{"h":"多少","p":"duōshao","t":"เท่าไหร่","e":"你们学校有多少学生？","id":25},{"h":"谁","p":"shéi","t":"ใคร","e":"那个人是谁？","id":91},{"h":"什么","p":"shénme","t":"อะไร","e":"你看见了什么？","id":92},{"h":"怎么","p":"zěnme","t":"อย่างไร","e":"你怎么去北京？","id":140},{"h":"怎么样","p":"zěnmeyàng","t":"เป็นอย่างไร","e":"我们去看电影，怎么样？","id":141},{"h":"吗","p":"ma","t":"ไหม หรือไม่ (ใช้ในประโยคคำถาม)","e":"你是中国人吗？","id":60},{"h":"呢","p":"ne","t":"ใส่ไว้ท้ายประโยคคำถาม","e":"你们家有几个人呢？","id":70}]},{"name":"อาชีพ & บุคคลในสังคม","emoji":"👥","color":"#0F6E56","words":[{"h":"老师","p":"lǎoshī","t":"ครู","e":"他就是我们的汉语老师。","id":53},{"h":"学生","p":"xuésheng","t":"นักเรียน","e":"我们学校里的学生很多。","id":127},{"h":"医生","p":"yīshēng","t":"หมอ","e":"他是这个医院里的医生。","id":133},{"h":"先生","p":"xiānsheng","t":"คุณ (ผู้ชาย)","e":"你也认识王先生？","id":118},{"h":"小姐","p":"xiǎojiě","t":"คุณ (ผู้หญิง)","e":"小姐，你叫什么名字？","id":122},{"h":"同学","p":"tóngxué","t":"เพื่อนนักเรียน","e":"同学们，你们好！","id":109},{"h":"朋友","p":"péngyou","t":"เพื่อน","e":"他是我的好朋友。","id":75},{"h":"人","p":"rén","t":"คน","e":"商店里有很多人。","id":84},{"h":"喂","p":"wèi","t":"ฮัลโหล","e":"喂，李老师在吗？","id":110}]},{"name":"แนะนำตัว","emoji":"👋","color":"#185FA5","words":[{"h":"叫","p":"jiào","t":"ชื่อว่า","e":"我的名字叫李明。","id":45},{"h":"名字","p":"míngzi","t":"ชื่อ","e":"我的名字叫李明。","id":66},{"h":"认识","p":"rènshi","t":"รู้จัก","e":"认识你很高兴。","id":85}]},{"name":"อาหาร & เครื่องดื่ม","emoji":"🍜","color":"#854F0B","words":[{"h":"菜","p":"cài","t":"ผัก, กับข้าว","e":"我去超市买点儿菜。","id":9},{"h":"茶","p":"chá","t":"น้ำชา, ใบชา","e":"请喝杯茶吧。","id":10},{"h":"米饭","p":"mǐfàn","t":"ข้าวสวย","e":"我爱吃米饭。","id":64},{"h":"苹果","p":"píngguǒ","t":"แอปเปิ้ล","e":"你想不想吃个苹果？","id":77},{"h":"水果","p":"shuǐguǒ","t":"ผลไม้","e":"我想去商店买水果。","id":98},{"h":"吃","p":"chī","t":"กิน","e":"请吃点儿米饭。","id":11},{"h":"喝","p":"hē","t":"ดื่ม","e":"我想喝水。","id":37}]},{"name":"สถานที่","emoji":"📍","color":"#534AB7","words":[{"h":"北京","p":"Běijīng","t":"ปักกิ่ง","e":"我住在北京。","id":5},{"h":"饭店","p":"fàndiàn","t":"ร้านอาหาร, โรงแรม","e":"中午我们去饭店吃吧。","id":28},{"h":"商店","p":"shāngdiàn","t":"ร้านค้า","e":"她去商店买东西了。","id":87},{"h":"学校","p":"xuéxiào","t":"โรงเรียน","e":"我们学校很大。","id":129},{"h":"医院","p":"yīyuàn","t":"โรงพยาบาล","e":"这是一个大医院。","id":134},{"h":"家","p":"jiā","t":"บ้าน, ครอบครัว","e":"我家在北京。","id":44},{"h":"中国","p":"Zhōngguó","t":"ประเทศจีน","e":"我在中国学汉语。","id":143},{"h":"汉语","p":"Hànyǔ","t":"ภาษาจีน","e":"他在学习汉语。","id":34}]},{"name":"ทิศทาง & ตำแหน่ง","emoji":"🧭","color":"#993C1D","words":[{"h":"后面","p":"hòumiàn","t":"ด้านหลัง","e":"商店在学校后面。","id":40},{"h":"前面","p":"qiánmiàn","t":"ด้านหน้า","e":"前面那个人是我的同学。","id":80},{"h":"上","p":"shàng","t":"ด้านบน","e":"水果在桌子上。","id":88},{"h":"下","p":"xià","t":"ด้านล่าง, ถัดไป","e":"小猫在桌子下面。","id":115},{"h":"里","p":"lǐ","t":"ใน","e":"我们都在学校里。","id":56}]},{"name":"ของใช้ & เทคโนโลยี","emoji":"💻","color":"#3B6D11","words":[{"h":"电脑","p":"diànnǎo","t":"คอมพิวเตอร์","e":"我买了个电脑。","id":17},{"h":"电视","p":"diànshì","t":"โทรทัศน์","e":"妈妈在看电视。","id":18},{"h":"电影","p":"diànyǐng","t":"ภาพยนตร์","e":"我喜欢看电影。","id":19},{"h":"打电话","p":"dǎ diànhuà","t":"โทรศัพท์","e":"他在打电话呢。","id":13},{"h":"杯子","p":"bēizi","t":"ถ้วย, แก้ว","e":"杯子里有茶。","id":4},{"h":"书","p":"shū","t":"หนังสือ","e":"我喜欢读书。","id":96},{"h":"桌子","p":"zhuōzi","t":"โต๊ะ","e":"电脑在桌子上。","id":146},{"h":"椅子","p":"yǐzi","t":"เก้าอี้","e":"小狗在椅子下面呢。","id":135},{"h":"衣服","p":"yīfu","t":"เสื้อผ้า","e":"我在商店买了很多衣服。","id":132}]},{"name":"การเดินทาง","emoji":"🚕","color":"#0F6E56","words":[{"h":"出租车","p":"chūzūchē","t":"รถแท็กซี่","e":"我们坐出租车去火车站。","id":12},{"h":"飞机","p":"fēijī","t":"เครื่องบิน","e":"我坐飞机去北京。","id":29},{"h":"去","p":"qù","t":"ไป","e":"我星期三去中国。","id":82},{"h":"回","p":"huí","t":"กลับ","e":"我八点回家。","id":41},{"h":"在","p":"zài","t":"อยู่ที่","e":"书在桌子上。","id":139},{"h":"住","p":"zhù","t":"อยู่, อาศัย","e":"他在北京住了很多年。","id":145},{"h":"坐","p":"zuò","t":"นั่ง, โดยสาร","e":"我坐飞机去中国。","id":149}]},{"name":"อารมณ์ & ความรู้สึก","emoji":"😊","color":"#185FA5","words":[{"h":"爱","p":"ài","t":"รัก, ชอบ","e":"妈妈，我爱你。","id":1},{"h":"高兴","p":"gāoxìng","t":"ดีใจ","e":"今天我很高兴。","id":31},{"h":"漂亮","p":"piàoliang","t":"สวย","e":"你的衣服真漂亮。","id":76},{"h":"喜欢","p":"xǐhuan","t":"ชอบ","e":"我喜欢学汉语。","id":114},{"h":"太","p":"tài","t":"มากเกิน","e":"这个学校太大了。","id":106},{"h":"小","p":"xiǎo","t":"เล็ก","e":"这个苹果太小了。","id":121}]},{"name":"สภาพอากาศ","emoji":"☀️","color":"#854F0B","words":[{"h":"天气","p":"tiānqì","t":"อากาศ","e":"今天的天气非常好。","id":107},{"h":"热","p":"rè","t":"ร้อน","e":"今天很热。","id":83},{"h":"冷","p":"lěng","t":"หนาว","e":"今天太冷了。","id":55}]},{"name":"คำทักทาย & มารยาท","emoji":"🙏","color":"#534AB7","words":[{"h":"不客气","p":"bú kàqi","t":"ไม่เป็นไร (ตอบรับเมื่ออีกฝ่ายขอบคุณ)","e":"甲：谢谢你！乙：不客气。","id":7},{"h":"对不起","p":"duìbuqǐ","t":"ขอโทษ","e":"甲：对不起。乙：没关系。","id":23},{"h":"没关系","p":"méi guānxi","t":"ไม่เป็นไร (ตอบรับเมื่ออีกฝ่ายขอโทษ)","e":"甲：对不起！乙：没关系。","id":62},{"h":"谢谢","p":"xièxie","t":"ขอบคุณ, ขอบใจ","e":"甲：谢谢你。乙：不客气！","id":125},{"h":"再见","p":"zàijiàn","t":"ลาก่อน","e":"妈妈，我去学校了，再见。","id":138},{"h":"好","p":"hǎo","t":"ดี","e":"今天天气很好。","id":35}]},{"name":"กริยา (สื่อสาร/รับรู้)","emoji":"💬","color":"#993C1D","words":[{"h":"写","p":"xiě","t":"เขียน","e":"你写的字很漂亮。","id":124},{"h":"说","p":"shuō","t":"พูด","e":"你在说什么？","id":100},{"h":"说话","p":"shuōhuà","t":"พูดคุย","e":"他们在说话。","id":101},{"h":"听","p":"tīng","t":"ฟัง","e":"你听，谁来了？","id":108},{"h":"读","p":"dú","t":"อ่าน","e":"你会读这个汉字吗？","id":22},{"h":"请","p":"qǐng","t":"เชิญ","e":"请坐在椅子上。","id":81},{"h":"看","p":"kàn","t":"ดู, มอง, อ่าน","e":"你看，那本书在桌子上呢。","id":49},{"h":"是","p":"shì","t":"เป็น, คือ","e":"他不是学生。","id":95}]},{"name":"กริยา (ทั่วไป)","emoji":"🏃","color":"#3B6D11","words":[{"h":"买","p":"mǎi","t":"ซื้อ","e":"我买了一些苹果。","id":61},{"h":"开","p":"kāi","t":"ขับ (รถ)","e":"我开了三年出租车了。","id":48},{"h":"睡觉","p":"shuìjiào","t":"นอน, หลับ","e":"儿子在睡觉呢。","id":99},{"h":"会","p":"huì","t":"เป็น, สามารถ","e":"我会开车。","id":42},{"h":"能","p":"néng","t":"สามารถ, ได้","e":"我能坐在这儿吗？","id":71},{"h":"想","p":"xiǎng","t":"อยาก, คิด","e":"我想星期六去北京。","id":120},{"h":"有","p":"yǒu","t":"มี","e":"我有一个女儿。","id":136},{"h":"不","p":"bù","t":"ไม่","e":"我不是学生。","id":8}]},{"name":"เงิน & การซื้อขาย","emoji":"💰","color":"#0F6E56","words":[{"h":"块","p":"kuài","t":"หยวน","e":"这本书三十块钱。","id":51},{"h":"钱","p":"qián","t":"เงิน","e":"一个苹果三块钱。","id":79},{"h":"多","p":"duō","t":"มาก","e":"这里的人很多。","id":24},{"h":"少","p":"shǎo","t":"น้อย","e":"杯子里的水很少。","id":90}]},{"name":"ลักษณนาม & ปริมาณ","emoji":"🔣","color":"#185FA5","words":[{"h":"本","p":"běn","t":"เล่ม","e":"桌子上有一本书。","id":6},{"h":"个","p":"gè","t":"คน, อัน (ลักษณนาม)","e":"我是一个学生。","id":32},{"h":"分钟","p":"fēnzhōng","t":"นาที","e":"我想休息几分钟。","id":30},{"h":"一点儿","p":"yīdiǎnr","t":"เล็กน้อย","e":"我只有一点儿钱。","id":131},{"h":"些","p":"xiē","t":"เล็กน้อย, บ้าง","e":"我买了些苹果。","id":123},{"h":"的","p":"de","t":"ของ","e":"这是我的书。","id":15}]},{"name":"คำเชื่อม & คำขยาย","emoji":"🔗","color":"#854F0B","words":[{"h":"都","p":"dōu","t":"ทุกคน, ทั้งหมด, ล้วน","e":"我们都来了。","id":21},{"h":"和","p":"hé","t":"และ, กับ","e":"爸爸和妈妈都在家。","id":38},{"h":"很","p":"hěn","t":"มาก","e":"李小姐很漂亮。","id":39},{"h":"了","p":"le","t":"แล้ว","e":"昨天下雨了。","id":54},{"h":"大","p":"dà","t":"ใหญ่","e":"这个苹果很大。","id":14},{"h":"来","p":"lái","t":"มา","e":"他是昨天来这儿的。","id":52},{"h":"工作","p":"gōngzuò","t":"งาน, ทำงาน","e":"我很喜欢现在的工作。","id":33},{"h":"岁","p":"suì","t":"ปี(ใช้ในการแสดงอายุ)","e":"李医生今年40岁。","id":103},{"h":"字","p":"zì","t":"ตัวอักษร","e":"这个字你认识吗？","id":147},{"h":"看见","p":"kànjiàn","t":"เห็น","e":"我没看见他。","id":50},{"h":"水","p":"shuǐ","t":"น้ำ","e":"杯子里还有水吗？","id":97},{"h":"做","p":"zuò","t":"ทำ, ประกอบอาชีพ","e":"今天妈妈做了很多菜。","id":150},{"h":"没有","p":"méiyǒu","t":"ไม่มี, ไม่เท่า","e":"我家里没有人。","id":63},{"h":"学习","p":"xuéxí","t":"เรียน","e":"你喜欢学习汉语吗？","id":128},{"h":"东西","p":"dōngxi","t":"สิ่งของ","e":"我在商店买了很多东西。","id":20}]}];
+var HSK2_RAW = [{"name":"ครอบครัว & ความสัมพันธ์","emoji":"👨‍👩‍👧‍👦","color":"#534AB7","words":[{"id":170,"h":"弟弟","p":"dìdi","t":"น้องชาย","e":"在我们家，我最大，我下面还有两个弟弟。"},{"id":180,"h":"哥哥","p":"gēge","t":"พี่ชาย","e":"我哥哥比我大三岁。"},{"id":188,"h":"孩子","p":"háizi","t":"ลูก, เด็ก","e":"我有三个孩子。"},{"id":199,"h":"姐姐","p":"jiějie","t":"พี่สาว","e":"我有两个姐姐。"},{"id":223,"h":"妹妹","p":"mèimei","t":"น้องสาว","e":"我有两个妹妹。"},{"id":226,"h":"您","p":"nín","t":"คุณ, ท่าน","e":"老师，您好！"},{"id":228,"h":"女","p":"nǚ","t":"เพศหญิง","e":"那个女人你认识吗？"},{"id":225,"h":"男","p":"nán","t":"เพศชาย","e":"我不认识那个男人。"},{"id":233,"h":"妻子","p":"qīzi","t":"ภรรยา","e":"我妻子上班去了。"},{"id":290,"h":"丈夫","p":"zhàngfu","t":"สามี","e":"我丈夫在医院工作。"}]},{"name":"สี","emoji":"🎨","color":"#993C1D","words":[{"id":152,"h":"白","p":"bái","t":"ขาว","e":"我很爱穿那件白衣服。"},{"id":190,"h":"黑","p":"hēi","t":"สีดำ","e":"我不喜欢黑颜色的衣服。"},{"id":191,"h":"红","p":"hóng","t":"สีแดง","e":"我的自行车是红色的。"},{"id":271,"h":"颜色","p":"yánsè","t":"สี","e":"你喜欢哪种颜色？"}]},{"name":"ตัวเลข & จำนวน","emoji":"🔢","color":"#1D9E75","words":[{"id":153,"h":"百","p":"bǎi","t":"ร้อย (จำนวน)","e":"这个自行车五百多元。"},{"id":171,"h":"第一","p":"dìyī","t":"แรก, อันดับที่ 1","e":"这是我第一次见到他。"},{"id":215,"h":"两","p":"liǎng","t":"สอง","e":"苹果两块钱一斤。"},{"id":235,"h":"千","p":"qiān","t":"พัน (จำนวน)","e":"这个手机一千元。"}]},{"name":"เวลา & ช่วงวัน","emoji":"🕐","color":"#185FA5","words":[{"id":240,"h":"日","p":"rì","t":"วัน","e":"今天是2012年2月26日。"},{"id":245,"h":"时间","p":"shíjiān","t":"เวลา","e":"我没时间去北京。"},{"id":258,"h":"晚上","p":"wǎnshang","t":"กลางคืน","e":"今天晚上我不能看电视了。"},{"id":289,"h":"早上","p":"zǎoshang","t":"ตอนเช้า","e":"我早上看见过他。"},{"id":238,"h":"去年","p":"qùnián","t":"ปีที่แล้ว","e":"我是去年8月来北京的。"},{"id":265,"h":"小时","p":"xiǎoshí","t":"ชั่วโมง","e":"我看了一小时的书。"},{"id":234,"h":"起床","p":"qǐchuáng","t":"ตื่นนอน","e":"我早上七点起床。"},{"id":241,"h":"上班","p":"shàngbān","t":"เข้างาน, ทำงาน","e":"我七点半去上班。"}]},{"name":"สภาพอากาศ","emoji":"☀️","color":"#854F0B","words":[{"id":237,"h":"晴","p":"qíng","t":"(อากาศ) แจ่มใส","e":"今天是晴天。"},{"id":270,"h":"雪","p":"xuě","t":"หิมะ","e":"今年冬天下了几次大雪。"},{"id":282,"h":"阴","p":"yīn","t":"มืดครึ้ม","e":"今天是阴天。"}]},{"name":"สัตว์","emoji":"🐾","color":"#3B6D11","words":[{"id":184,"h":"狗","p":"gǒu","t":"สุนัข","e":"女儿很喜欢小狗。"},{"id":221,"h":"猫","p":"māo","t":"แมว","e":"你的小猫去哪儿了？"},{"id":285,"h":"鱼","p":"yú","t":"ปลา","e":"水里有很多鱼。"},{"id":273,"h":"羊肉","p":"yángròu","t":"เนื้อแพะหรือเนื้อแกะ","e":"有些人不爱吃羊肉。"}]},{"name":"อาหาร & เครื่องดื่ม","emoji":"🍜","color":"#0F6E56","words":[{"id":196,"h":"鸡蛋","p":"jīdàn","t":"ไข่ไก่","e":"我每天早上都要吃个鸡蛋。"},{"id":205,"h":"咖啡","p":"kāfēi","t":"กาแฟ","e":"您想喝咖啡，还是茶？"},{"id":227,"h":"牛奶","p":"niúnǎi","t":"นมวัว","e":"睡觉前喝杯牛奶吧。"},{"id":262,"h":"西瓜","p":"xīguā","t":"แตงโม","e":"请吃块儿西瓜。"},{"id":189,"h":"好吃","p":"hǎochī","t":"อร่อย","e":"您做的米饭真好吃。"}]},{"name":"สถานที่","emoji":"📍","color":"#185FA5","words":[{"id":175,"h":"房间","p":"fángjiān","t":"ห้อง","e":"我们两个人住一个房间。"},{"id":177,"h":"服务员","p":"fúwùyuán","t":"บริกร","e":"我在饭馆做服务员。"},{"id":182,"h":"公共汽车","p":"gōnggòngqìchē","t":"รถเมล์","e":"坐公共汽车去，要20分钟。"},{"id":183,"h":"公司","p":"gōngsī","t":"บริษัท","e":"我在一个公司上班。"},{"id":194,"h":"火车站","p":"huǒchēzhàn","t":"สถานีรถไฟ","e":"我下午3点去火车站。"},{"id":195,"h":"机场","p":"jīchǎng","t":"สนามบิน","e":"我在机场工作了三年了。"},{"id":198,"h":"教室","p":"jiàoshì","t":"ห้องเรียน","e":"请大家都到教室去上课。"},{"id":216,"h":"路","p":"lù","t":"ถนน, สาย (รถเมล์)","e":"我每天走路去上学。"}]},{"name":"ทิศทาง & ตำแหน่ง","emoji":"🧭","color":"#854F0B","words":[{"id":229,"h":"旁边","p":"pángbiān","t":"ข้างๆ","e":"爸爸在我旁边。"},{"id":255,"h":"外","p":"wài","t":"นอก","e":"外面下雨了。"},{"id":284,"h":"右边","p":"yòubian","t":"ด้านขวา","e":"王医生右边那个人是谁？"},{"id":300,"h":"左边","p":"zuǒbian","t":"ด้านซ้าย","e":"左边的那个杯子是你的，右边的是我的。"},{"id":202,"h":"近","p":"jìn","t":"ใกล้","e":"我们家离公司很近。"},{"id":214,"h":"离","p":"lí","t":"ห่างจาก","e":"我家离学校很近。"},{"id":286,"h":"远","p":"yuǎn","t":"ไกล","e":"我家离公司很远。"}]},{"name":"กีฬา & กิจกรรมยามว่าง","emoji":"⚽","color":"#993C1D","words":[{"id":159,"h":"唱歌","p":"chànggē","t":"ร้องเพลง","e":"我最爱唱歌了，我给你们唱一个。"},{"id":165,"h":"打篮球","p":"dǎ lánqiú","t":"เล่นบาสเกตบอล","e":"我每天下午都去打篮球。"},{"id":230,"h":"跑步","p":"pǎobù","t":"วิ่งจ็อกกิ้ง","e":"我每天早上都跑步。"},{"id":254,"h":"跳舞","p":"tiàowǔ","t":"เต้นรำ","e":"妹妹会唱歌，也会跳舞。"},{"id":252,"h":"踢足球","p":"tī zúqiú","t":"เตะฟุตบอล","e":"我和同学们在踢足球。"},{"id":283,"h":"游泳","p":"yóuyǒng","t":"ว่ายน้ำ","e":"我会游泳了。"},{"id":217,"h":"旅游","p":"lǚyóu","t":"ท่องเที่ยว","e":"我们开车去旅游。"},{"id":257,"h":"玩","p":"wán","t":"เล่น","e":"他在玩，没有学习。"},{"id":287,"h":"运动","p":"yùndòng","t":"ออกกำลังกาย","e":"我们都很喜欢运动。"}]},{"name":"ของใช้ & สิ่งของ","emoji":"🎒","color":"#534AB7","words":[{"id":155,"h":"报纸","p":"bàozhǐ","t":"หนังสือพิมพ์","e":"我每天早上都要读报纸。"},{"id":197,"h":"件","p":"jiàn","t":"ชิ้น, ตัว (ลักษณนามเสื้อผ้า)","e":"这件衣服颜色非常好看。"},{"id":224,"h":"门","p":"mén","t":"ประตู","e":"我在门外等你。"},{"id":232,"h":"票","p":"piào","t":"ตั๋ว, บัตร","e":"我要去火车站买车票。"},{"id":236,"h":"铅笔","p":"qiānbǐ","t":"ดินสอ","e":"你看见我的铅笔了吗？"},{"id":247,"h":"手表","p":"shǒubiǎo","t":"นาฬิกาข้อมือ","e":"这块手表非常漂亮。"},{"id":248,"h":"手机","p":"shǒujī","t":"มือถือ","e":"你看，我新买了一个手机。"},{"id":297,"h":"自行车","p":"zìxíngchē","t":"จักรยาน","e":"这是我新买的自行车。"},{"id":274,"h":"药","p":"yào","t":"ยา","e":"这个药一天吃三次。"},{"id":253,"h":"题","p":"tí","t":"ข้อ","e":"这个题我不会做。"}]},{"name":"สุขภาพ & ร่างกาย","emoji":"💊","color":"#0F6E56","words":[{"id":213,"h":"累","p":"lèi","t":"เหนื่อย","e":"我累了，想休息。"},{"id":242,"h":"身体","p":"shēntǐ","t":"ร่างกาย, สุขภาพ","e":"今天我的身体不太舒服。"},{"id":243,"h":"生病","p":"shēngbìng","t":"ป่วย","e":"我生病了，不能去上班了。"},{"id":272,"h":"眼睛","p":"yǎnjing","t":"ดวงตา","e":"我的眼睛是黑色的。"}]},{"name":"กริยา (สื่อสาร/รับรู้)","emoji":"💬","color":"#185FA5","words":[{"id":154,"h":"帮助","p":"bāngzhù","t":"ช่วยเหลือ","e":"请帮助我找一家搬家公司，好吗？"},{"id":172,"h":"懂","p":"dǒng","t":"เข้าใจ","e":"你的意思我懂了。"},{"id":200,"h":"介绍","p":"jièshào","t":"แนะนำให้รู้จัก","e":"我来介绍一下我的朋友。"},{"id":204,"h":"觉得","p":"juéde","t":"รู้สึก","e":"你觉得这本书怎么样？"},{"id":239,"h":"让","p":"ràng","t":"(อนุญาต) ให้","e":"他爸爸不让他来。"},{"id":249,"h":"送","p":"sòng","t":"ให้, มอบ","e":"我送你一本书。"},{"id":260,"h":"问","p":"wèn","t":"ถาม","e":"老师，我可以问你一个问题吗？"},{"id":263,"h":"希望","p":"xīwàng","t":"หวัง","e":"我希望你别走了。"},{"id":295,"h":"知道","p":"zhīdào","t":"รู้","e":"我不知道他现在在哪里。"},{"id":192,"h":"欢迎","p":"huānyíng","t":"ยินดีต้อนรับ","e":"欢迎你们来我们家。"},{"id":193,"h":"回答","p":"huídá","t":"ตอบ","e":"我能回答这个问题。"},{"id":179,"h":"告诉","p":"gàosu","t":"บอก","e":"你能告诉我学校怎么走吗？"}]},{"name":"กริยา (การกระทำทั่วไป)","emoji":"🏃","color":"#854F0B","words":[{"id":161,"h":"穿","p":"chuān","t":"ใส่","e":"天冷了，多穿些衣服吧。"},{"id":167,"h":"到","p":"dào","t":"ถึง","e":"我早上9点到公司。"},{"id":169,"h":"等","p":"děng","t":"รอ","e":"你还要再等我10分钟。"},{"id":181,"h":"给","p":"gěi","t":"ให้","e":"请把这本书给他。"},{"id":201,"h":"进","p":"jìn","t":"เข้า","e":"我马上要进机场了。"},{"id":206,"h":"开始","p":"kāishǐ","t":"เริ่ม","e":"我们从第十课开始学习。"},{"id":218,"h":"卖","p":"mài","t":"ขาย","e":"这个商店卖的东西比较便宜。"},{"id":256,"h":"完","p":"wán","t":"จบ","e":"这本书我看完了。"},{"id":264,"h":"洗","p":"xǐ","t":"ล้าง, ซัก","e":"今天我要洗很多衣服。"},{"id":266,"h":"笑","p":"xiào","t":"หัวเราะ","e":"听到他这么说，我们都笑了。"},{"id":269,"h":"休息","p":"xiūxi","t":"พักผ่อน","e":"太累了，让我休息一下。"},{"id":291,"h":"找","p":"zhǎo","t":"หา","e":"他想找一个工作。"},{"id":296,"h":"准备","p":"zhǔnbèi","t":"เตรียม","e":"我准备星期日去北京。"},{"id":298,"h":"走","p":"zǒu","t":"เดิน, ไป, จากไป","e":"我女儿9个月就会走了。"},{"id":160,"h":"出","p":"chū","t":"ออก","e":"我已经走出火车站了。"}]},{"name":"คุณศัพท์ (ลักษณะ)","emoji":"✨","color":"#993C1D","words":[{"id":158,"h":"长","p":"cháng","t":"ยาว","e":"姐姐的腿长，跑得快。"},{"id":164,"h":"错","p":"cuò","t":"ผิด","e":"对不起，我错了。"},{"id":173,"h":"对","p":"duì","t":"ถูกต้อง","e":"你是对的，我错了。"},{"id":178,"h":"高","p":"gāo","t":"สูง","e":"我比爸爸还高。"},{"id":185,"h":"贵","p":"guì","t":"แพง","e":"这块手表很贵。"},{"id":211,"h":"快","p":"kuài","t":"เร็ว, ใกล้จะ","e":"他跑得真快。"},{"id":212,"h":"快乐","p":"kuàilè","t":"มีความสุข","e":"祝你生日快乐！"},{"id":219,"h":"慢","p":"màn","t":"ช้า","e":"我们走得很慢。"},{"id":220,"h":"忙","p":"máng","t":"งานยุ่ง, ยุ่ง","e":"这个星期，我很忙。"},{"id":267,"h":"新","p":"xīn","t":"ใหม่","e":"这是我买的新衣服。"},{"id":293,"h":"真","p":"zhēn","t":"จริงๆ","e":"这个人真高。"},{"id":176,"h":"非常","p":"fēicháng","t":"มาก","e":"奶奶非常喜欢我们送的礼物。"},{"id":231,"h":"便宜","p":"piányi","t":"(ราคา) ถูก","e":"苹果很便宜，我们买点儿吧。"}]},{"name":"คำถาม & คำเชื่อม (Q)","emoji":"❓","color":"#3B6D11","words":[{"id":259,"h":"为什么","p":"wèishénme","t":"ทำไม","e":"你为什么不喝点儿水呢？"},{"id":250,"h":"虽然……但是……","p":"suīrán…dànshì…","t":"แม้ว่า...แต่ว่า...","e":"虽然下雨了，虽然我们还是想去看电影。"},{"id":281,"h":"因为……所以……","p":"yīnwèi…suǒyǐ…","t":"เพราะ...จึง...","e":"因为下雨了，因为我没去跑步。"},{"id":156,"h":"比","p":"bǐ","t":"กว่า, เปรียบเทียบ","e":"我的孩子比我高。"}]},{"name":"คำเชื่อม & คำขยาย","emoji":"🔗","color":"#534AB7","words":[{"id":151,"h":"吧","p":"ba","t":"ล่ะสิ, เถอะ, สิ","e":"你是个学生吧？"},{"id":157,"h":"别","p":"bié","t":"อย่า","e":"太晚了，别看电视了。"},{"id":163,"h":"从","p":"cóng","t":"จาก","e":"从我家到公司，开车要20分钟。"},{"id":168,"h":"得","p":"de","t":"ได้ (ใช้แสดงระดับการกระทำของกริยา)","e":"你走得太快了。"},{"id":174,"h":"对","p":"duì","t":"กับ, ต่อ","e":"孩子对妈妈说：“妈妈，我爱你。”"},{"id":186,"h":"过","p":"guo","t":"เคย","e":"我没看过这本书。"},{"id":187,"h":"还","p":"hái","t":"ยัง, ยัง...ด้วย","e":"他还没来呢。"},{"id":203,"h":"就","p":"jiù","t":"ก็, ก็...ทันที","e":"我就知道他会来的。"},{"id":208,"h":"可能","p":"kěnéng","t":"อาจจะ","e":"我可能不能去上班了。"},{"id":209,"h":"可以","p":"kěyǐ","t":"สามารถ, ได้","e":"你可以开我的车去上班。"},{"id":222,"h":"每","p":"měi","t":"ทุก","e":"你每天都看报纸吗？"},{"id":276,"h":"也","p":"yě","t":"ก็...ด้วย","e":"你去，我也去。"},{"id":277,"h":"一下","p":"yīxià","t":"สักครู่","e":"请等我一下。"},{"id":278,"h":"一起","p":"yīqǐ","t":"ด้วยกัน","e":"我和你一起去北京。"},{"id":279,"h":"已经","p":"yǐjīng","t":"แล้ว","e":"我们已经吃完饭了。"},{"id":288,"h":"再","p":"zài","t":"อีก, มากขึ้นอีก","e":"我吃完饭再去商店。"},{"id":292,"h":"着","p":"zhe","t":"อยู่ (แสดงการต่อเนื่องของการกระทำ)","e":"他笑着说：“你不认识我，但是我认识你。”"},{"id":294,"h":"正在","p":"zhèngzài","t":"กำลัง...อยู่","e":"弟弟正在打篮球。"},{"id":299,"h":"最","p":"zuì","t":"ที่สุด","e":"她是我最好的朋友。"},{"id":251,"h":"它","p":"tā","t":"มัน","e":"我知道小猫在哪儿，它在桌子下面。"},{"id":275,"h":"要","p":"yào","t":"จะ, ขอให้, ควร, ต้องใช้","e":"我要去北京。"},{"id":280,"h":"意思","p":"yìsi","t":"ความหมาย, ความเห็น, ความสนุก","e":"这个词是什么意思？"}]},{"name":"เรียน & ทำงาน","emoji":"📚","color":"#0F6E56","words":[{"id":207,"h":"考试","p":"kǎoshì","t":"สอบ","e":"为了准备考试，他每天都学习到很晚。"},{"id":210,"h":"课","p":"kè","t":"บทเรียน, ห้องเรียน","e":"今天我们学习第一课。"},{"id":261,"h":"问题","p":"wèntí","t":"ปัญหา, คำถาม","e":"这个问题太难了！"},{"id":246,"h":"事情","p":"shìqing","t":"เรื่องราว","e":"你下午有什么事情吗？"},{"id":166,"h":"大家","p":"dàjiā","t":"ทุกคน","e":"请大家不要等我了。"},{"id":268,"h":"姓","p":"xìng","t":"แซ่, นามสกุล","e":"中国人的姓在名字的前面。"},{"id":244,"h":"生日","p":"shēngrì","t":"วันเกิด","e":"祝你生日快乐！"},{"id":162,"h":"次","p":"cì","t":"ครั้ง","e":"我去过一次北京。"}]}];
+
+var HSK1_ALL = [];
+HSK1_RAW.forEach(function(g){ g.words.forEach(function(w){ HSK1_ALL.push(w); }); });
+
+var HSK2_GROUPS = HSK2_RAW;
+var HSK2_ALL = [];
+HSK2_GROUPS.forEach(function(g,gi){ g.words.forEach(function(w){ w.cat=g.name; w.catIdx=gi; w.emoji=g.emoji; w.color=g.color; HSK2_ALL.push(w); }); });
+var COMBINED_ALL = HSK1_ALL.concat(HSK2_ALL);
+
+/* Dictionary-based greedy segmenter for arrange-sentence mode */
+var SEG_SET = {};
+COMBINED_ALL.forEach(function(w){ SEG_SET[w.h] = true; });
+var SEG_MAXLEN = 1;
+Object.keys(SEG_SET).forEach(function(k){ if (k.length > SEG_MAXLEN) SEG_MAXLEN = k.length; });
+var PUNCT_RE = /[，。！？：；、,\.!\?:;"“”'‘’\s]/g;
+function segmentSentence(s){
+  var clean = s.replace(PUNCT_RE, "");
+  var tokens = [];
+  var i = 0;
+  while (i < clean.length){
+    var found = null;
+    for (var len = Math.min(SEG_MAXLEN, clean.length-i); len >= 2; len--){
+      var sub = clean.substr(i, len);
+      if (SEG_SET[sub]){ found = sub; break; }
+    }
+    if (!found) found = clean.substr(i,1);
+    tokens.push(found);
+    i += found.length;
+  }
+  return tokens;
+}
+
+/* ============ STORAGE / STATE ============ */
+var STATUS_KEY = "wave_game_hsk2_status_v1";
+var PROFILE_KEY = "wave_game_profile_v1";
+function loadJSON(key, fb){ try { var v = JSON.parse(localStorage.getItem(key)); return v || fb; } catch(e){ return fb; } }
+function saveJSON(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+
+var wordStatus = loadJSON(STATUS_KEY, {});
+function saveStatus(){ saveJSON(STATUS_KEY, wordStatus); }
+
+var defaultProfile = { xp:0, streak:0, lastActive:"", unlockedCats:[0], dailyLog:{} };
+var profile = loadJSON(PROFILE_KEY, defaultProfile);
+if (!profile.dailyLog) profile.dailyLog = {};
+if (!profile.unlockedCats || !profile.unlockedCats.length) profile.unlockedCats = [0];
+function saveProfile(){ saveJSON(PROFILE_KEY, profile); }
+
+var LEVEL_THRESH = [0,100,250,450,700,1000,1400,1900,2500,3200];
+function levelFromXP(xp){
+  var lvl = 1;
+  for (var i=1;i<LEVEL_THRESH.length;i++){ if (xp >= LEVEL_THRESH[i]) lvl = i+1; }
+  return Math.min(lvl,10);
+}
+function pad2(n){ return n<10 ? "0"+n : ""+n; }
+function todayStr(){ var d=new Date(); return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
+function yesterdayStr(){ var d=new Date(); d.setDate(d.getDate()-1); return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
+
+function touchStreak(){
+  var t = todayStr();
+  if (profile.lastActive === t) return;
+  if (profile.lastActive === yesterdayStr()) profile.streak = (profile.streak||0)+1;
+  else profile.streak = 1;
+  profile.lastActive = t;
+  saveProfile();
+}
+function todayLog(){
+  var t = todayStr();
+  if (!profile.dailyLog[t]) profile.dailyLog[t] = { xp:0, learnedIds:[] };
+  return profile.dailyLog[t];
+}
+function addXP(n){
+  profile.xp += n;
+  todayLog().xp += n;
+  saveProfile();
+  refreshHeader();
+}
+function markLearned(id){
+  var log = todayLog();
+  if (log.learnedIds.indexOf(id) < 0) log.learnedIds.push(id);
+  saveProfile();
+}
+function setWordStatus(id, status){
+  wordStatus[id] = status;
+  saveStatus();
+  if (status === 3) markLearned(id);
+  recomputeUnlocks();
+}
+function categoryPct(gi){
+  var words = HSK2_GROUPS[gi].words;
+  var done = 0;
+  words.forEach(function(w){ if (wordStatus[w.id]===3) done++; });
+  return words.length ? Math.round(done/words.length*100) : 0;
+}
+function recomputeUnlocks(){
+  var changed = false;
+  for (var i=0;i<HSK2_GROUPS.length-1;i++){
+    if (profile.unlockedCats.indexOf(i)>=0 && categoryPct(i)>=80 && profile.unlockedCats.indexOf(i+1)<0){
+      profile.unlockedCats.push(i+1);
+      changed = true;
+      showToast("🎉 ปลดล็อกหมวดใหม่: " + HSK2_GROUPS[i+1].emoji + " " + HSK2_GROUPS[i+1].name);
+    }
+  }
+  if (changed) saveProfile();
+}
+function getUnlockedAllWords(){
+  var arr = [];
+  HSK2_GROUPS.forEach(function(g,i){ if (profile.unlockedCats.indexOf(i)>=0) arr = arr.concat(g.words); });
+  return arr;
+}
+function getScopeWords(scopeObj){
+  return scopeObj.scope === "all" ? getUnlockedAllWords() : HSK2_GROUPS[scopeObj.cat].words;
+}
+function filterByStatus(words, filter){
+  if (filter === "new") return words.filter(function(w){ return !wordStatus[w.id]; });
+  if (filter === "no") return words.filter(function(w){ return wordStatus[w.id]===1 || wordStatus[w.id]===2; });
+  if (filter === "yes") return words.filter(function(w){ return wordStatus[w.id]===3; });
+  return words.slice();
+}
+function statusPillInfo(id){
+  var st = wordStatus[id];
+  if (!st) return {cls:"sp-new", txt:"ยังไม่เรียน"};
+  if (st===3) return {cls:"sp-yes", txt:"จำได้แล้ว"};
+  return {cls:"sp-no", txt:"จำไม่ได้"};
+}
+
+/* ============ UTIL ============ */
+function speak(text, rate){
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = "zh-CN"; u.rate = rate || 0.9; u.pitch = 1;
+  window.speechSynthesis.speak(u);
+}
+function shuffle(arr){
+  for (var i=arr.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=arr[i]; arr[i]=arr[j]; arr[j]=t; }
+  return arr;
+}
+function sample(arr, n){ return shuffle(arr.slice()).slice(0, n); }
+function el(id){ return document.getElementById(id); }
+var toastTimer=null;
+function showToast(msg){
+  var t = el("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+}
+
+/* ============ DONE OVERLAY ============ */
+var doneRestartFn = null;
+function showDoneOverlay(title, sub, stats, restartFn){
+  el("done-title2").textContent = title;
+  el("done-sub2").textContent = sub;
+  var html = "";
+  stats.forEach(function(s){ html += '<div class="ds2"><div class="ds2-n" style="color:'+(s.color||"#111")+'">'+s.n+'</div><div class="ds2-l">'+s.l+'</div></div>'; });
+  el("done-stats2").innerHTML = html;
+  doneRestartFn = restartFn;
+  el("done-overlay").style.display = "flex";
+}
+function hideDoneOverlay(){ el("done-overlay").style.display = "none"; }
+function doneRestart(){ hideDoneOverlay(); if (doneRestartFn) doneRestartFn(); }
+
+/* ============ NAV ============ */
+var VIEW_TITLES = { home:"Wave · เรียนจีน", learn:"📖 เรียนคำใหม่", quiz:"📝 Quiz 4 ตัวเลือก", match:"🃏 จับคู่การ์ด", dictate:"🎧 เขียนตามคำบอก", listen:"👂 ฟังประโยค", arrange:"🔤 เรียงประโยค" };
+function showView(v){
+  document.querySelectorAll(".view").forEach(function(x){ x.classList.remove("active"); });
+  el("view-"+v).classList.add("active");
+  el("btn-back").style.display = v==="home" ? "none" : "inline-flex";
+  el("view-title").textContent = VIEW_TITLES[v] || "Wave";
+  if (v==="home") refreshHome();
+}
+function goHome(){ hideDoneOverlay(); window.speechSynthesis && window.speechSynthesis.cancel(); showView("home"); }
+function openMode(m){
+  if (m==="learn"){ renderLearnSetup(); learnReset(); }
+  if (m==="quiz"){ renderQuizSetup(); el("quiz-setup").style.display="block"; el("quiz-play").style.display="none"; }
+  if (m==="match"){ renderMatchSetup(); el("match-setup").style.display="block"; el("match-play").style.display="none"; }
+  if (m==="dictate"){ renderDictateSetup(); el("dictate-setup").style.display="block"; el("dictate-play").style.display="none"; }
+  if (m==="listen"){ el("listen-setup").style.display="block"; el("listen-play").style.display="none"; }
+  if (m==="arrange"){ el("arrange-setup").style.display="block"; el("arrange-play").style.display="none"; }
+  showView(m);
+}
+
+function refreshHeader(){
+  el("streak-pill").textContent = "🔥" + (profile.streak||0);
+  el("level-pill").textContent = "Lv." + levelFromXP(profile.xp);
+}
+function refreshHome(){
+  var lvl = levelFromXP(profile.xp);
+  var cur = LEVEL_THRESH[lvl-1];
+  var next = lvl<10 ? LEVEL_THRESH[lvl] : LEVEL_THRESH[9];
+  var span = (next-cur) || 1;
+  var pct = lvl>=10 ? 100 : Math.max(0,Math.min(100, Math.round((profile.xp-cur)/span*100)));
+  el("lvl-label").textContent = "Level " + lvl;
+  el("xp-label").textContent = profile.xp + " / " + next + " XP";
+  el("xp-bar").style.width = pct + "%";
+  var log = todayLog();
+  el("today-learned").textContent = log.learnedIds.length;
+  el("today-xp").textContent = log.xp;
+  el("today-streak").textContent = profile.streak||0;
+  renderCatBoard();
+  refreshHeader();
+}
+function renderCatBoard(){
+  var html = "";
+  HSK2_GROUPS.forEach(function(g,i){
+    var unlocked = profile.unlockedCats.indexOf(i)>=0;
+    var pct = unlocked ? categoryPct(i) : 0;
+    html += '<div class="board-row'+(unlocked?"":" locked")+'">'
+      + '<div class="board-emoji">'+(unlocked?g.emoji:"🔒")+'</div>'
+      + '<div class="board-info"><div class="board-name">'+g.name+'</div>'
+      + '<div class="board-bar-wrap"><div class="board-bar-fill" style="width:'+pct+'%;background:'+g.color+'"></div></div></div>'
+      + '<div class="board-pct">'+(unlocked?pct+"%":"—")+'</div></div>';
+  });
+  el("cat-board").innerHTML = html;
+}
+
+/* generic category grid renderer (HSK2, respects unlock) */
+function renderCatGrid(containerId, selectedIdx, singleMode, onSelect){
+  var c = el(containerId);
+  var html = "";
+  HSK2_GROUPS.forEach(function(g,i){
+    var unlocked = profile.unlockedCats.indexOf(i)>=0;
+    var on = (i===selectedIdx && unlocked);
+    html += '<div class="cat-chip'+(on?" on":"")+(unlocked?"":" locked")+'" data-i="'+i+'" style="'+(on?"border-color:"+g.color:"")+'">'
+      + '<span class="cat-emoji">'+(unlocked?g.emoji:"🔒")+'</span>'+g.name+' ('+g.words.length+')</div>';
+  });
+  c.innerHTML = html;
+  Array.prototype.forEach.call(c.querySelectorAll(".cat-chip"), function(chip){
+    var i = parseInt(chip.getAttribute("data-i"),10);
+    var unlocked = profile.unlockedCats.indexOf(i)>=0;
+    chip.onclick = unlocked ? function(){ onSelect(i); } : function(){ showToast("🔒 ต้องเรียนหมวดก่อนหน้าให้ผ่าน 80% ก่อนถึงจะปลดล็อก"); };
+  });
+}
+
+/* ================= MODE 1: LEARN ================= */
+var learnState = { scope:"all", cat:0, filter:"all", deck:[], idx:0, good:0, miss:0, xp:0 };
+function renderLearnSetup(){
+  el("learn-sc-all").className = "sctab" + (learnState.scope==="all"?" on":"");
+  el("learn-sc-cat").className = "sctab" + (learnState.scope==="cat"?" on":"");
+  el("learn-cat-picker").className = "cat-picker" + (learnState.scope==="cat"?" show":"");
+  renderCatGrid("learn-cat-grid", learnState.cat, false, function(i){ learnState.cat=i; learnReset(); renderLearnSetup(); });
+  var tabs = [["all","ทั้งหมด"],["new","ยังไม่เรียน"],["no","จำไม่ได้"],["yes","จำได้แล้ว"]];
+  el("learn-status-tabs").innerHTML = tabs.map(function(t){ return '<div class="fstab'+(learnState.filter===t[0]?" on":"")+'" data-f="'+t[0]+'">'+t[1]+'</div>'; }).join("");
+  Array.prototype.forEach.call(el("learn-status-tabs").querySelectorAll(".fstab"), function(b){
+    b.onclick = function(){ learnState.filter=b.getAttribute("data-f"); learnReset(); renderLearnSetup(); };
+  });
+}
+function learnSetScope(s){ learnState.scope=s; learnReset(); renderLearnSetup(); }
+function learnStats(){
+  var scopeWords = getScopeWords(learnState);
+  var nNew=0,nNo=0,nYes=0;
+  scopeWords.forEach(function(w){ var st=wordStatus[w.id]; if(!st) nNew++; else if(st===3) nYes++; else nNo++; });
+  el("learn-s-new").textContent=nNew; el("learn-s-no").textContent=nNo; el("learn-s-yes").textContent=nYes;
+  el("learn-s-pct").textContent = (scopeWords.length? Math.round(nYes/scopeWords.length*100):0) + "%";
+}
+function learnReset(){
+  learnState.idx=0; learnState.good=0; learnState.miss=0; learnState.xp=0;
+  learnState.deck = filterByStatus(getScopeWords(learnState), learnState.filter);
+  learnStats();
+  showLearnCard();
+}
+function showLearnCard(){
+  learnStats();
+  if (learnState.idx >= learnState.deck.length){
+    showDoneOverlay("🎉 เรียนครบแล้ว!", "เรียนคำใหม่ — จำได้ "+learnState.good+" คำ",
+      [{n:learnState.good,l:"จำได้แล้ว",color:"#1D9E75"},{n:learnState.miss,l:"ยังไม่แม่น",color:"#E24B4A"},{n:learnState.xp,l:"XP ที่ได้"}],
+      learnReset);
+    return;
+  }
+  var w = learnState.deck[learnState.idx];
+  el("learn-hanzi").textContent = w.h;
+  el("learn-pinyin").textContent = w.p;
+  el("learn-meaning").textContent = w.t;
+  el("learn-example").textContent = w.e;
+  var pill = statusPillInfo(w.id);
+  var pe = el("learn-status-pill"); pe.className="status-pill "+pill.cls; pe.textContent=pill.txt;
+  el("learn-cat-pill").textContent = (w.emoji||"") + " " + (w.cat||"");
+  el("learn-idx").textContent = (learnState.idx+1) + " / " + learnState.deck.length;
+  el("learn-prog").style.width = Math.round(learnState.idx/learnState.deck.length*100) + "%";
+  speak(w.h);
+}
+function learnSpeak(e){ e.stopPropagation(); var w=learnState.deck[learnState.idx]; if(w) speak(w.h); }
+function learnSetStatus(level){
+  var w = learnState.deck[learnState.idx];
+  if (!w) return;
+  setWordStatus(w.id, level);
+  var gain = level===3 ? 3 : 1;
+  addXP(gain); learnState.xp += gain;
+  if (level===3) learnState.good++; else learnState.miss++;
+  learnState.idx++;
+  showLearnCard();
+}
+function learnNext(){ if (learnState.idx < learnState.deck.length-1){ learnState.idx++; showLearnCard(); } }
+function learnPrev(){ if (learnState.idx > 0){ learnState.idx--; showLearnCard(); } }
+
+/* ================= MODE 2: QUIZ ================= */
+var quizState = { scope:"all", cat:0, deck:[], idx:0, correct:0, xp:0, answered:false };
+function renderQuizSetup(){
+  el("quiz-sc-all").className = "sctab" + (quizState.scope==="all"?" on":"");
+  el("quiz-sc-cat").className = "sctab" + (quizState.scope==="cat"?" on":"");
+  el("quiz-cat-picker").className = "cat-picker" + (quizState.scope==="cat"?" show":"");
+  renderCatGrid("quiz-cat-grid", quizState.cat, false, function(i){ quizState.cat=i; renderQuizSetup(); });
+}
+function quizSetScope(s){ quizState.scope=s; renderQuizSetup(); }
+function startQuiz(){
+  var pool = getScopeWords(quizState);
+  if (pool.length < 2){ showToast("หมวดนี้มีคำน้อยเกินไป"); return; }
+  var n = Math.min(10, pool.length);
+  var picks = sample(pool, n);
+  quizState.deck = picks.map(function(w){
+    var dir = Math.random()<0.5 ? "h2m" : "m2h";
+    var distractorPool = (pool.length>=4 ? pool : HSK2_ALL).filter(function(x){ return x.id!==w.id; });
+    var distractors = sample(distractorPool, 3);
+    var options = shuffle([w].concat(distractors));
+    return { word:w, dir:dir, options:options, correctId:w.id };
+  });
+  quizState.idx=0; quizState.correct=0; quizState.xp=0;
+  el("quiz-setup").style.display="none";
+  el("quiz-play").style.display="block";
+  showQuizQuestion();
+}
+function showQuizQuestion(){
+  if (quizState.idx >= quizState.deck.length){
+    var pct = Math.round(quizState.correct/quizState.deck.length*100);
+    showDoneOverlay(pct>=80?"🎉 เก่งมาก!":pct>=60?"👍 ดีมาก!":"💪 ฝึกต่อไป!", "Quiz — แม่นยำ "+pct+"%",
+      [{n:quizState.correct+"/"+quizState.deck.length,l:"ตอบถูก",color:"#1D9E75"},{n:pct+"%",l:"แม่นยำ"},{n:quizState.xp,l:"XP ที่ได้"}],
+      function(){ el("quiz-play").style.display="none"; el("quiz-setup").style.display="block"; });
+    return;
+  }
+  quizState.answered=false;
+  el("quiz-idx").textContent = "ข้อ " + (quizState.idx+1) + " / " + quizState.deck.length;
+  var q = quizState.deck[quizState.idx];
+  var promptBox = el("quiz-prompt-box");
+  if (q.dir === "h2m"){
+    promptBox.innerHTML = '<button class="tts-btn" onclick="speak(\''+q.word.h+'\')">🔊</button><div class="quiz-hanzi">'+q.word.h+'</div><div class="quiz-pinyin">'+q.word.p+'</div>';
+    speak(q.word.h);
+  } else {
+    promptBox.innerHTML = '<div style="font-size:11px;color:#aaa;margin-bottom:8px">คำนี้ภาษาจีนคืออะไร?</div><div class="quiz-meaning-prompt">'+q.word.t+'</div>';
+  }
+  var optHtml = "";
+  q.options.forEach(function(o,i){
+    var label = q.dir==="h2m" ? o.t : (o.h+' <span style="font-size:11px;color:#999">'+o.p+'</span>');
+    optHtml += '<div class="quiz-opt" data-i="'+i+'">'+label+'</div>';
+  });
+  el("quiz-options").innerHTML = optHtml;
+  Array.prototype.forEach.call(el("quiz-options").querySelectorAll(".quiz-opt"), function(b){
+    b.onclick = function(){ answerQuiz(parseInt(b.getAttribute("data-i"),10)); };
+  });
+  el("quiz-next-btn").style.display = "none";
+}
+function answerQuiz(selIdx){
+  if (quizState.answered) return;
+  quizState.answered = true;
+  var q = quizState.deck[quizState.idx];
+  var opts = el("quiz-options").querySelectorAll(".quiz-opt");
+  var correct = q.options[selIdx].id === q.correctId;
+  Array.prototype.forEach.call(opts, function(b,i){
+    b.classList.add("disabled");
+    if (q.options[i].id === q.correctId) b.classList.add("correct");
+    else if (i===selIdx) b.classList.add("wrong");
+  });
+  setWordStatus(q.word.id, correct?3:1);
+  var gain = correct?5:1;
+  addXP(gain); quizState.xp += gain;
+  if (correct) quizState.correct++;
+  if (q.dir==="m2h") speak(q.word.h);
+  el("quiz-next-btn").style.display = "block";
+}
+function quizNext(){ quizState.idx++; showQuizQuestion(); }
+
+/* ================= MODE 3: MATCH ================= */
+var matchState = { cat:0, cards:[], flippedIdx:[], matchedCount:0, totalPairs:0, timer:null, startTime:0, xp:0, locked:false };
+function renderMatchSetup(){
+  renderCatGrid("match-cat-grid", matchState.cat, true, function(i){ matchState.cat=i; renderMatchSetup(); });
+}
+function startMatch(){
+  clearInterval(matchState.timer);
+  var words = HSK2_GROUPS[matchState.cat].words;
+  var picks = sample(words, Math.min(8, words.length));
+  var cards = [];
+  picks.forEach(function(w){
+    cards.push({ wordId:w.id, type:"h", text:w.h, sub:w.p });
+    cards.push({ wordId:w.id, type:"t", text:w.t, sub:"" });
+  });
+  matchState.cards = shuffle(cards);
+  matchState.flippedIdx = [];
+  matchState.matchedCount = 0;
+  matchState.totalPairs = picks.length;
+  matchState.xp = 0;
+  matchState.locked = false;
+  matchState.startTime = Date.now();
+  el("match-setup").style.display="none";
+  el("match-play").style.display="block";
+  renderMatchGrid();
+  matchState.timer = setInterval(updateMatchTimer, 250);
+  updateMatchTimer();
+}
+function updateMatchTimer(){
+  var sec = Math.floor((Date.now()-matchState.startTime)/1000);
+  el("match-timer").textContent = pad2(Math.floor(sec/60)) + ":" + pad2(sec%60);
+}
+function renderMatchGrid(){
+  var html = "";
+  matchState.cards.forEach(function(c,i){
+    var flipped = matchState.flippedIdx.indexOf(i)>=0;
+    var cls = "match-card" + (c.matched?" matched":(flipped?" flipped hidden-text":""));
+    var content = (c.matched || flipped) ? (c.sub ? c.text+"<br><span style=\"font-size:9px;opacity:.6\">"+c.sub+"</span>" : c.text) : "🀄";
+    html += '<div class="'+cls+'" data-i="'+i+'">'+content+'</div>';
+  });
+  el("match-grid").innerHTML = html;
+  Array.prototype.forEach.call(el("match-grid").querySelectorAll(".match-card"), function(cardEl){
+    cardEl.onclick = function(){ flipMatchCard(parseInt(cardEl.getAttribute("data-i"),10)); };
+  });
+}
+function flipMatchCard(i){
+  if (matchState.locked) return;
+  var c = matchState.cards[i];
+  if (c.matched || matchState.flippedIdx.indexOf(i)>=0) return;
+  if (matchState.flippedIdx.length>=2) return;
+  matchState.flippedIdx.push(i);
+  if (c.type==="h") speak(c.text);
+  renderMatchGrid();
+  if (matchState.flippedIdx.length===2){
+    var a = matchState.cards[matchState.flippedIdx[0]];
+    var b = matchState.cards[matchState.flippedIdx[1]];
+    if (a.wordId===b.wordId){
+      a.matched=true; b.matched=true;
+      matchState.flippedIdx=[];
+      matchState.matchedCount++;
+      addXP(3); matchState.xp+=3;
+      renderMatchGrid();
+      if (matchState.matchedCount>=matchState.totalPairs) finishMatch();
+    } else {
+      matchState.locked=true;
+      setTimeout(function(){ matchState.flippedIdx=[]; matchState.locked=false; renderMatchGrid(); }, 700);
+    }
+  }
+}
+function finishMatch(){
+  clearInterval(matchState.timer);
+  var sec = Math.floor((Date.now()-matchState.startTime)/1000);
+  var bonus = sec<40?15:(sec<80?8:0);
+  if (bonus>0){ addXP(bonus); matchState.xp+=bonus; }
+  showDoneOverlay("🎉 จับคู่ครบแล้ว!", HSK2_GROUPS[matchState.cat].name+" — เวลา "+pad2(Math.floor(sec/60))+":"+pad2(sec%60),
+    [{n:pad2(Math.floor(sec/60))+":"+pad2(sec%60),l:"เวลาที่ใช้"},{n:matchState.totalPairs,l:"คู่ที่จับได้",color:"#1D9E75"},{n:matchState.xp,l:"XP ที่ได้"}],
+    function(){ el("match-play").style.display="none"; el("match-setup").style.display="block"; });
+}
+
+/* ================= MODE 4: DICTATE ================= */
+var dictateState = { scope:"all", cat:0, deck:[], idx:0, spd:0.7, good:0, miss:0, xp:0 };
+function renderDictateSetup(){
+  el("dictate-sc-all").className = "sctab" + (dictateState.scope==="all"?" on":"");
+  el("dictate-sc-cat").className = "sctab" + (dictateState.scope==="cat"?" on":"");
+  el("dictate-cat-picker").className = "cat-picker" + (dictateState.scope==="cat"?" show":"");
+  renderCatGrid("dictate-cat-grid", dictateState.cat, false, function(i){ dictateState.cat=i; renderDictateSetup(); });
+}
+function dictateSetScope(s){ dictateState.scope=s; renderDictateSetup(); }
+function startDictate(){
+  var words = getScopeWords(dictateState);
+  if (!words.length){ showToast("ไม่มีคำในหมวดนี้"); return; }
+  dictateState.deck = shuffle(words.slice());
+  dictateState.idx=0; dictateState.good=0; dictateState.miss=0; dictateState.xp=0;
+  el("dictate-setup").style.display="none";
+  el("dictate-play").style.display="block";
+  showDictateFront();
+}
+function showDictateFront(){
+  if (dictateState.idx >= dictateState.deck.length){
+    showDoneOverlay("🎉 ครบแล้ว!", "เขียนตามคำบอก — จำได้ "+dictateState.good+" คำ",
+      [{n:dictateState.good,l:"เขียนถูก",color:"#1D9E75"},{n:dictateState.miss,l:"เขียนผิด",color:"#E24B4A"},{n:dictateState.xp,l:"XP ที่ได้"}],
+      function(){ el("dictate-play").style.display="none"; el("dictate-setup").style.display="block"; });
+    return;
+  }
+  var w = dictateState.deck[dictateState.idx];
+  el("dt-front").style.display="block";
+  el("dt-back").style.display="none";
+  el("dt-cat-pill").textContent = (w.emoji||"")+" "+(w.cat||"");
+  el("dt-round-lbl").textContent = "ข้อ "+(dictateState.idx+1)+" / "+dictateState.deck.length;
+  el("dt-meaning-big").textContent = w.t;
+  setTimeout(function(){ speak(w.h, dictateState.spd); }, 300);
+}
+function dtPlay(){
+  var w = dictateState.deck[dictateState.idx]; if (!w) return;
+  var btn = el("dt-play-btn");
+  btn.classList.add("playing");
+  setTimeout(function(){ btn.classList.remove("playing"); }, 1000);
+  speak(w.h, dictateState.spd);
+}
+function dtSetSpd(s, b){ dictateState.spd=s; Array.prototype.forEach.call(document.querySelectorAll(".spd-btn"), function(x){ x.className="spd-btn"; }); b.className="spd-btn on"; }
+function dtReveal(){
+  var w = dictateState.deck[dictateState.idx];
+  el("rv-hanzi").textContent=w.h; el("rv-pinyin").textContent=w.p; el("rv-th").textContent=w.t;
+  el("dt-round-lbl2").textContent = el("dt-round-lbl").textContent;
+  el("dt-front").style.display="none"; el("dt-back").style.display="block";
+  speak(w.h, dictateState.spd);
+}
+function dtAnswer(correct){
+  var w = dictateState.deck[dictateState.idx];
+  setWordStatus(w.id, correct?3:1);
+  var gain = correct?5:1;
+  addXP(gain); dictateState.xp+=gain;
+  if (correct) dictateState.good++; else dictateState.miss++;
+  dictateState.idx++;
+  showDictateFront();
+}
+
+/* ================= MODE 5: LISTEN ================= */
+var listenState = { level:1, deck:[], idx:0, correct:0, xp:0, replaysUsed:0, answered:false };
+function listenSetLevel(l, b){ listenState.level=l; Array.prototype.forEach.call(document.querySelectorAll(".lvltab"), function(x){ x.className="lvltab"; }); b.className="lvltab on"; }
+var LISTEN_RATE = {1:0.75, 2:0.95, 3:1.25};
+var LISTEN_REPLAYS = {1:99, 2:2, 3:1};
+var LISTEN_XP_MULT = {1:1, 2:1.5, 3:2};
+function startListen(){
+  listenState.deck = sample(COMBINED_ALL, 10);
+  listenState.idx=0; listenState.correct=0; listenState.xp=0;
+  el("listen-setup").style.display="none";
+  el("listen-play").style.display="block";
+  showListenQuestion();
+}
+function showListenQuestion(){
+  if (listenState.idx >= listenState.deck.length){
+    var pct = Math.round(listenState.correct/listenState.deck.length*100);
+    showDoneOverlay(pct>=80?"🎉 เก่งมาก!":pct>=60?"👍 ดีมาก!":"💪 ฝึกต่อไป!", "ฟังประโยค — แม่นยำ "+pct+"%",
+      [{n:listenState.correct+"/"+listenState.deck.length,l:"ตอบถูก",color:"#1D9E75"},{n:pct+"%",l:"แม่นยำ"},{n:listenState.xp,l:"XP ที่ได้"}],
+      function(){ el("listen-play").style.display="none"; el("listen-setup").style.display="block"; });
+    return;
+  }
+  listenState.answered=false;
+  listenState.replaysUsed=0;
+  var w = listenState.deck[listenState.idx];
+  el("listen-round-lbl").textContent = "ข้อ "+(listenState.idx+1)+" / "+listenState.deck.length;
+  var pool = COMBINED_ALL.filter(function(x){ return x.t !== w.t; });
+  var distractors;
+  if (listenState.level===3){
+    pool = pool.slice().sort(function(a,b){ return Math.abs(a.t.length-w.t.length) - Math.abs(b.t.length-w.t.length); });
+    distractors = sample(pool.slice(0, Math.min(20,pool.length)), 3);
+  } else {
+    distractors = sample(pool, 3);
+  }
+  var options = shuffle([w.t].concat(distractors.map(function(d){ return d.t; })));
+  var optHtml = "";
+  options.forEach(function(o,i){ optHtml += '<div class="listen-opt" data-i="'+i+'">'+o+'</div>'; });
+  el("listen-options").innerHTML = optHtml;
+  var correctVal = w.t;
+  Array.prototype.forEach.call(el("listen-options").querySelectorAll(".listen-opt"), function(b){
+    b.onclick = function(){ answerListen(b, b.textContent===correctVal); };
+  });
+  el("listen-next-btn").style.display="none";
+  updateReplayInfo();
+  setTimeout(function(){ speak(w.e, LISTEN_RATE[listenState.level]); listenState.replaysUsed++; updateReplayInfo(); }, 400);
+}
+function updateReplayInfo(){
+  var max = LISTEN_REPLAYS[listenState.level];
+  el("listen-replay-info").textContent = listenState.level===1 ? "ฟังซ้ำได้ไม่จำกัด" : ("ฟังซ้ำได้อีก "+Math.max(0,max-listenState.replaysUsed)+" ครั้ง");
+}
+function listenPlay(){
+  var w = listenState.deck[listenState.idx]; if (!w) return;
+  var max = LISTEN_REPLAYS[listenState.level];
+  if (listenState.replaysUsed >= max){ showToast("ฟังซ้ำได้ครบแล้ว"); return; }
+  var btn = el("listen-play-btn");
+  btn.classList.add("playing");
+  setTimeout(function(){ btn.classList.remove("playing"); }, 1000);
+  speak(w.e, LISTEN_RATE[listenState.level]);
+  listenState.replaysUsed++;
+  updateReplayInfo();
+}
+function answerListen(btnEl, correct){
+  if (listenState.answered) return;
+  listenState.answered = true;
+  var w = listenState.deck[listenState.idx];
+  Array.prototype.forEach.call(el("listen-options").querySelectorAll(".listen-opt"), function(b){
+    b.classList.add("disabled");
+    if (b.textContent===w.t) b.classList.add("correct");
+    else if (b===btnEl) b.classList.add("wrong");
+  });
+  var gain = Math.round((correct?5:1) * LISTEN_XP_MULT[listenState.level]);
+  addXP(gain); listenState.xp += gain;
+  if (correct) listenState.correct++;
+  if (w.id >= 151) setWordStatus(w.id, correct?3:1);
+  el("listen-next-btn").style.display="block";
+}
+function listenNext(){ listenState.idx++; showListenQuestion(); }
+
+/* ================= MODE 6: ARRANGE ================= */
+var arrangeState = { deck:[], idx:0, tokens:[], bank:[], answer:[], correct:0, xp:0, checked:false };
+function startArrange(){
+  var pool = COMBINED_ALL.filter(function(w){ return w.e && w.e.replace(PUNCT_RE,"").length<=16 && w.e.replace(PUNCT_RE,"").length>=3; });
+  arrangeState.deck = sample(pool, Math.min(8, pool.length));
+  arrangeState.idx=0; arrangeState.correct=0; arrangeState.xp=0;
+  el("arrange-setup").style.display="none";
+  el("arrange-play").style.display="block";
+  showArrangeQuestion();
+}
+function showArrangeQuestion(){
+  if (arrangeState.idx >= arrangeState.deck.length){
+    var pct = Math.round(arrangeState.correct/arrangeState.deck.length*100);
+    showDoneOverlay(pct>=80?"🎉 เก่งมาก!":pct>=60?"👍 ดีมาก!":"💪 ฝึกต่อไป!", "เรียงประโยค — แม่นยำ "+pct+"%",
+      [{n:arrangeState.correct+"/"+arrangeState.deck.length,l:"ถูกต้อง",color:"#1D9E75"},{n:pct+"%",l:"แม่นยำ"},{n:arrangeState.xp,l:"XP ที่ได้"}],
+      function(){ el("arrange-play").style.display="none"; el("arrange-setup").style.display="block"; });
+    return;
+  }
+  var w = arrangeState.deck[arrangeState.idx];
+  arrangeState.tokens = segmentSentence(w.e);
+  arrangeState.bank = shuffle(arrangeState.tokens.slice());
+  arrangeState.answer = [];
+  arrangeState.checked = false;
+  el("arr-round-lbl").textContent = "ข้อ "+(arrangeState.idx+1)+" / "+arrangeState.deck.length;
+  el("arr-meaning").textContent = w.t + "  ( " + w.h + " )";
+  el("arr-reveal").style.display="none";
+  el("arr-next-btn").style.display="none";
+  renderArrangeTiles();
+  setTimeout(function(){ speak(w.e, 0.85); }, 350);
+}
+function renderArrangeTiles(){
+  var bankHtml = arrangeState.bank.map(function(t,i){ return '<div class="tile" data-bank="'+i+'">'+t+'</div>'; }).join("");
+  var ansHtml = arrangeState.answer.map(function(t,i){ return '<div class="tile" data-ans="'+i+'">'+t+'</div>'; }).join("");
+  el("tile-bank").innerHTML = bankHtml;
+  el("tile-answer").innerHTML = ansHtml;
+  Array.prototype.forEach.call(el("tile-bank").querySelectorAll(".tile"), function(t){
+    t.onclick = function(){ if(arrangeState.checked) return; var i=parseInt(t.getAttribute("data-bank"),10); arrangeState.answer.push(arrangeState.bank[i]); arrangeState.bank.splice(i,1); renderArrangeTiles(); };
+  });
+  Array.prototype.forEach.call(el("tile-answer").querySelectorAll(".tile"), function(t){
+    t.onclick = function(){ if(arrangeState.checked) return; var i=parseInt(t.getAttribute("data-ans"),10); arrangeState.bank.push(arrangeState.answer[i]); arrangeState.answer.splice(i,1); renderArrangeTiles(); };
+  });
+}
+function arrClear(){
+  if (arrangeState.checked) return;
+  arrangeState.bank = arrangeState.bank.concat(arrangeState.answer);
+  arrangeState.answer = [];
+  renderArrangeTiles();
+}
+function arrSpeak(){ var w = arrangeState.deck[arrangeState.idx]; if (w) speak(w.e, 0.85); }
+function arrCheck(){
+  if (arrangeState.checked) return;
+  var w = arrangeState.deck[arrangeState.idx];
+  var userStr = arrangeState.answer.join("");
+  var correctStr = arrangeState.tokens.join("");
+  var isCorrect = userStr === correctStr;
+  arrangeState.checked = true;
+  Array.prototype.forEach.call(el("tile-answer").querySelectorAll(".tile"), function(t){
+    t.classList.add(isCorrect ? "answered-correct" : "answered-wrong");
+  });
+  if (!isCorrect){
+    el("arr-reveal").style.display="block";
+    el("arr-reveal").innerHTML = "เฉลย: <b>" + arrangeState.tokens.join(" ") + "</b><br>" + w.e;
+  }
+  var gain = isCorrect?8:2;
+  addXP(gain); arrangeState.xp += gain;
+  if (isCorrect) arrangeState.correct++;
+  if (w.id >= 151) setWordStatus(w.id, isCorrect?3:2);
+  el("arr-next-btn").style.display="block";
+}
+function arrNext(){ arrangeState.idx++; showArrangeQuestion(); }
+
+/* ============ INIT ============ */
+function init(){
+  touchStreak();
+  refreshHeader();
+  showView("home");
+}
+init();
+
+if ("serviceWorker" in navigator && (location.protocol==="http:" || location.protocol==="https:")){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

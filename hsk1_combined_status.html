@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HSK1 รวม 150 คำ — Wave</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;background:#f5f4f0;min-height:100vh;padding:16px}
+.app{max-width:480px;margin:0 auto}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.logo{font-size:13px;font-weight:500;color:#888}
+.badge{background:#1D9E75;color:white;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+
+.mode-tabs{display:flex;gap:6px;margin-bottom:14px}
+.mtab{flex:1;text-align:center;padding:9px 6px;border-radius:10px;border:1.5px solid #ddd;background:white;font-size:12px;font-weight:500;color:#666;cursor:pointer}
+.mtab.on{background:#111;color:white;border-color:#111}
+
+/* Scope: รวมทั้งหมด vs แยกตามหมวด */
+.scope-tabs{display:flex;gap:6px;margin-bottom:12px}
+.sctab{flex:1;text-align:center;padding:9px 6px;border-radius:10px;border:1.5px solid #ddd;background:white;font-size:12px;font-weight:600;color:#666;cursor:pointer}
+.sctab.on{background:#534AB7;color:white;border-color:#534AB7}
+
+/* Category picker (when scope=category) */
+.cat-picker{display:none;margin-bottom:12px}
+.cat-picker.show{display:block}
+.cat-label{font-size:11px;color:#888;margin-bottom:6px;letter-spacing:.04em}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:160px;overflow-y:auto;padding:2px}
+.cat-chip{background:white;border:1.5px solid #e0ddd6;border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;font-size:10px;font-weight:500;color:#555}
+.cat-chip.on{border-width:2px}
+.cat-emoji{font-size:16px;display:block;margin-bottom:2px}
+
+.status-tabs{display:flex;gap:5px;margin-bottom:14px}
+.fstab{flex:1;text-align:center;font-size:11px;padding:7px 4px;border-radius:8px;border:1.5px solid #ddd;background:white;color:#666;cursor:pointer;font-weight:500}
+.fstab.fs-all.on{background:#111;color:white;border-color:#111}
+.fstab.fs-new.on{background:#FAEEDA;color:#854F0B;border-color:#854F0B}
+.fstab.fs-no.on{background:#fef5f5;color:#E24B4A;border-color:#E24B4A}
+.fstab.fs-yes.on{background:#E1F5EE;color:#0F6E56;border-color:#0F6E56}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.sc{background:white;border-radius:10px;padding:9px 6px;text-align:center}
+.sv{font-size:18px;font-weight:700;color:#111}
+.sl{font-size:10px;color:#888;margin-top:1px}
+.sv.gray{color:#888}.sv.red{color:#E24B4A}.sv.green{color:#1D9E75}
+
+.prog-wrap{background:#e8e6e0;border-radius:4px;height:5px;margin-bottom:16px;overflow:hidden}
+.prog-fill{height:5px;background:#1D9E75;border-radius:4px;transition:width .4s}
+
+/* FLASHCARD */
+.card-wrap{perspective:1000px;margin-bottom:14px}
+.card{width:100%;min-height:260px;position:relative;cursor:pointer;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:20px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.front{background:white;box-shadow:0 2px 16px rgba(0,0,0,.07)}
+.back{background:#111;color:white;transform:rotateY(180deg);box-shadow:0 2px 16px rgba(0,0,0,.18)}
+.status-pill{position:absolute;top:12px;right:12px;font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600}
+.sp-new{background:#FAEEDA;color:#854F0B}
+.sp-no{background:#fef5f5;color:#E24B4A}
+.sp-yes{background:#E1F5EE;color:#0F6E56}
+.cat-pill{position:absolute;top:12px;left:12px;font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600;background:#f5f4f0;color:#888}
+.card-hint{font-size:11px;color:#bbb;margin-bottom:12px;letter-spacing:.04em}
+.card-th{font-size:25px;font-weight:600;color:#111;text-align:center;line-height:1.3;margin-bottom:6px}
+.tap-hint{font-size:11px;color:#ccc;position:absolute;bottom:16px}
+.tts-btn{background:rgba(255,255,255,.1);border:none;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:10px;font-size:14px}
+.card-hanzi{font-size:54px;font-weight:400;color:white;margin-bottom:4px;line-height:1}
+.card-pinyin{font-size:17px;color:#9de8cb;margin-bottom:10px;font-style:italic}
+.card-meaning{font-size:14px;color:#ddd;margin-bottom:10px;text-align:center}
+.card-example{font-size:11px;color:#777;text-align:center;line-height:1.6;padding:0 6px}
+
+.status-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.status-btn{border:none;border-radius:11px;padding:11px 4px;font-size:12px;font-weight:600;cursor:pointer}
+.sb-no{background:#fef5f5;color:#E24B4A}
+.sb-half{background:#FAEEDA;color:#854F0B}
+.sb-yes{background:#E1F5EE;color:#0F6E56}
+
+.nav-row{display:flex;align-items:center;justify-content:space-between}
+.nav-btn{background:white;border:1.5px solid #e0ddd6;color:#444;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer}
+.nav-idx{font-size:13px;color:#888}
+
+/* DICTATION */
+#dt-area{display:none}
+.dt-card{background:white;border-radius:20px;padding:26px 20px;margin-bottom:14px;box-shadow:0 2px 16px rgba(0,0,0,.06);text-align:center;position:relative}
+.dt-round-lbl{font-size:11px;color:#aaa;margin-bottom:16px;letter-spacing:.04em}
+.dt-play-big{width:88px;height:88px;border-radius:50%;background:#1D9E75;border:none;color:white;font-size:34px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(29,158,117,.3);margin-bottom:14px}
+.dt-play-big.playing{background:#185FA5;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px rgba(24,95,165,.25)}50%{box-shadow:0 4px 24px rgba(24,95,165,.5)}}
+.dt-instruct{font-size:13px;color:#666;line-height:1.7;margin-bottom:18px}
+.dt-instruct strong{color:#111}
+.spd-row{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
+.spd-btn{font-size:11px;padding:5px 12px;border-radius:20px;border:1.5px solid #ddd;background:white;color:#666;cursor:pointer}
+.spd-btn.on{background:#1D9E75;color:white;border-color:#1D9E75}
+.dt-reveal-btn{background:#111;color:white;border:none;border-radius:14px;padding:14px 24px;font-size:15px;font-weight:600;cursor:pointer;width:100%}
+.dt-back{display:none}
+.rv-num{font-size:11px;color:#aaa;margin-bottom:14px}
+.rv-hanzi{font-size:62px;font-weight:400;color:#111;line-height:1;margin-bottom:6px;font-family:"Noto Sans SC",sans-serif}
+.rv-pinyin{font-size:18px;color:#185FA5;font-style:italic;margin-bottom:8px}
+.rv-th{font-size:15px;color:#444;margin-bottom:14px;font-weight:500}
+.rv-divider{height:.5px;background:#f0efe9;margin:0 -20px 14px}
+.rv-ans-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rv-btn{border:none;border-radius:14px;padding:14px 10px;font-size:13px;font-weight:600;cursor:pointer}
+.rv-correct{background:#E1F5EE;color:#0F6E56}
+.rv-wrong{background:#FAEEDA;color:#854F0B}
+
+.done-scr{display:none;background:white;border-radius:20px;padding:26px 20px;text-align:center}
+.done-scr.show{display:block}
+.done-scr h2{font-size:20px;font-weight:600;margin-bottom:6px}
+.done-scr p{font-size:13px;color:#888;margin-bottom:18px}
+.done-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.ds{background:#f5f4f0;border-radius:10px;padding:13px 6px;text-align:center}
+.ds-n{font-size:22px;font-weight:700;color:#111}
+.ds-l{font-size:10px;color:#888;margin-top:2px}
+.restart-btn{background:#111;color:white;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <span class="logo">Wave · HSK1</span>
+    <span class="badge" id="top-badge">Flashcard</span>
+  </div>
+
+  <div class="mode-tabs">
+    <div class="mtab on" id="tab-fc" onclick="switchMode('fc')">📇 Flashcard</div>
+    <div class="mtab" id="tab-dt" onclick="switchMode('dt')">🎧 เขียนตามคำบอก</div>
+  </div>
+
+  <div class="scope-tabs">
+    <div class="sctab on" id="sc-all" onclick="setScope('all')">🌐 รวมทั้งหมด 150 คำ</div>
+    <div class="sctab" id="sc-cat" onclick="setScope('cat')">🗂 แยกตามหมวด</div>
+  </div>
+
+  <div class="cat-picker" id="cat-picker">
+    <div class="cat-label">เลือกหมวด</div>
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+
+  <div class="status-tabs">
+    <div class="fstab fs-all on" onclick="setStatusFilter('all',this)">ทั้งหมด</div>
+    <div class="fstab fs-new" onclick="setStatusFilter('new',this)">ยังไม่เรียน</div>
+    <div class="fstab fs-no" onclick="setStatusFilter('no',this)">จำไม่ได้</div>
+    <div class="fstab fs-yes" onclick="setStatusFilter('yes',this)">จำได้แล้ว</div>
+  </div>
+
+  <div class="stats">
+    <div class="sc"><div class="sv gray" id="s-new">150</div><div class="sl">ยังไม่เรียน</div></div>
+    <div class="sc"><div class="sv red" id="s-no">0</div><div class="sl">จำไม่ได้</div></div>
+    <div class="sc"><div class="sv green" id="s-yes">0</div><div class="sl">จำได้แล้ว</div></div>
+    <div class="sc"><div class="sv" id="s-pct">0%</div><div class="sl">ความคืบหน้า</div></div>
+  </div>
+  <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+
+  <div id="fc-area">
+    <div class="card-wrap">
+      <div class="card" id="fc-card" onclick="flipCard()">
+        <div class="face front">
+          <div class="cat-pill" id="fc-cat-pill"></div>
+          <div class="status-pill" id="fc-status-pill"></div>
+          <div class="card-hint">ความหมายภาษาไทย — แตะเพื่อดูตัวอักษรจีน</div>
+          <div class="card-th" id="fc-th"></div>
+          <div class="tap-hint">แตะการ์ดเพื่อพลิก</div>
+        </div>
+        <div class="face back">
+          <button class="tts-btn" onclick="speakCurr(event)">🔊</button>
+          <div class="card-hanzi" id="fc-hanzi"></div>
+          <div class="card-pinyin" id="fc-pinyin"></div>
+          <div class="card-meaning" id="fc-meaning"></div>
+          <div class="card-example" id="fc-example"></div>
+        </div>
+      </div>
+    </div>
+    <div class="status-row" id="ans-row" style="display:none">
+      <button class="status-btn sb-no" onclick="setStatus(1)">❌ จำไม่ได้</button>
+      <button class="status-btn sb-half" onclick="setStatus(2)">🤔 ยังไม่แน่น</button>
+      <button class="status-btn sb-yes" onclick="setStatus(3)">✅ จำได้แล้ว</button>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="prevCard()">← ก่อน</button>
+      <span class="nav-idx" id="fc-idx">1 / 150</span>
+      <button class="nav-btn" onclick="nextCard()">ถัดไป →</button>
+    </div>
+  </div>
+
+  <div id="dt-area">
+    <div class="dt-card" id="dt-card">
+      <div id="dt-front">
+        <div class="cat-pill" id="dt-cat-pill"></div>
+        <div class="status-pill" id="dt-status-pill"></div>
+        <div class="dt-round-lbl" id="dt-round-lbl">ข้อ 1 / 150</div>
+        <button class="dt-play-big" id="dt-play-btn" onclick="dtPlay()">🔊</button>
+        <div class="dt-instruct">กดฟังเสียง<br><strong>เขียนตัวอักษรจีนลงกระดาษ</strong></div>
+        <div class="spd-row">
+          <button class="spd-btn on" onclick="setSpd(0.7,this)">ช้า</button>
+          <button class="spd-btn" onclick="setSpd(1.0,this)">ปกติ</button>
+          <button class="spd-btn" onclick="setSpd(1.3,this)">เร็ว</button>
+        </div>
+        <button class="dt-reveal-btn" onclick="dtReveal()">ดูเฉลย →</button>
+      </div>
+      <div class="dt-back" id="dt-back">
+        <div class="rv-num" id="rv-num">ข้อ 1 / 150</div>
+        <div class="rv-hanzi" id="rv-hanzi"></div>
+        <div class="rv-pinyin" id="rv-pinyin"></div>
+        <div class="rv-th" id="rv-th"></div>
+        <div class="rv-divider"></div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px">เขียนถูกไหม?</div>
+        <div class="rv-ans-row">
+          <button class="rv-btn rv-correct" onclick="dtAnswer(true)">✓ เขียนถูก</button>
+          <button class="rv-btn rv-wrong" onclick="dtAnswer(false)">✗ เขียนผิด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="done-scr" id="done-scr">
+    <h2 id="done-title">🎉</h2>
+    <p id="done-sub"></p>
+    <div class="done-stats">
+      <div class="ds"><div class="ds-n" style="color:#1D9E75" id="done-good">0</div><div class="ds-l">จำได้</div></div>
+      <div class="ds"><div class="ds-n" style="color:#E24B4A" id="done-miss">0</div><div class="ds-l">ต้องทบทวน</div></div>
+      <div class="ds"><div class="ds-n" id="done-pct">0%</div><div class="ds-l">แม่นยำ</div></div>
+    </div>
+    <button class="restart-btn" onclick="restartCurrent()">เริ่มใหม่</button>
+  </div>
+</div>
+
+<script>
+var GROUPS = [{"name":"ตัวเลข 0–10","emoji":"🔢","color":"#1D9E75","words":[{"h":"零","p":"líng","t":"ศูนย์","e":"今年是二零一二年。","id":57},{"h":"一","p":"yī","t":"หนึ่ง","e":"这儿一个人都没有。","id":130},{"h":"八","p":"bā","t":"แปด","e":"他儿子今年八岁了。","id":2},{"h":"三","p":"sān","t":"สาม","e":"我有三本书。","id":86},{"h":"四","p":"sì","t":"สี่","e":"我们四个人去看电影。","id":102},{"h":"五","p":"wǔ","t":"ห้า","e":"今天星期五。","id":113},{"h":"六","p":"liù","t":"หก","e":"桌子上有六个杯子。","id":58},{"h":"七","p":"qī","t":"เจ็ด","e":"一个星期有七天。","id":78},{"h":"九","p":"jiǔ","t":"เก้า","e":"今天是八月九日。","id":47},{"h":"十","p":"shí","t":"สิบ","e":"现在是十月。","id":93},{"h":"二","p":"èr","t":"สอง","e":"现在十二点了。","id":27}]},{"name":"เวลาในแต่ละวัน","emoji":"🕐","color":"#185FA5","words":[{"h":"上午","p":"shàngwǔ","t":"ช่วงเช้า","e":"现在是上午10点。","id":89},{"h":"下午","p":"xiàwǔ","t":"ช่วงบ่าย","e":"我今天下午不去学校了。","id":116},{"h":"中午","p":"zhōngwǔ","t":"ตอนกลางวัน","e":"我今天中午去火车站。","id":144},{"h":"现在","p":"xiànzài","t":"ตอนนี้","e":"现在是12点。","id":119},{"h":"点","p":"diǎn","t":"โมง","e":"现在是下午3点20。","id":16},{"h":"下雨","p":"xià yǔ","t":"ฝนตก","e":"昨天下雨了。","id":117}]},{"name":"วันที่ & ปฏิทิน","emoji":"📅","color":"#854F0B","words":[{"h":"今天","p":"jīntiān","t":"วันนี้","e":"我今天去北京。","id":46},{"h":"明天","p":"míngtiān","t":"พรุ่งนี้","e":"今天星期日，明天是星期一。","id":65},{"h":"昨天","p":"zuótiān","t":"เมื่อวาน","e":"他昨天没去学校。","id":148},{"h":"星期","p":"xīngqī","t":"สัปดาห์","e":"一个星期有七天。","id":126},{"h":"月","p":"yuè","t":"เดือน","e":"一年有12个月。","id":137},{"h":"年","p":"nián","t":"ปี","e":"我在中国住了三年。","id":73},{"h":"号","p":"hào","t":"วันที่","e":"今天是2002年1月1号。","id":36},{"h":"时候","p":"shíhou","t":"ตอนที่","e":"我回家的时候，他在睡觉。","id":94}]},{"name":"ครอบครัว","emoji":"👨‍👩‍👧","color":"#534AB7","words":[{"h":"爸爸","p":"bàba","t":"พ่อ","e":"我爸爸是医生。","id":3},{"h":"妈妈","p":"māma","t":"แม่","e":"我妈妈不在家。","id":59},{"h":"儿子","p":"érzi","t":"ลูกชาย","e":"我儿子三岁了。","id":26},{"h":"女儿","p":"nǚ'ér","t":"ลูกสาว","e":"我有两个女儿。","id":74}]},{"name":"สรรพนาม บุคคล","emoji":"🙋","color":"#993C1D","words":[{"h":"我","p":"wǒ","t":"ฉัน, ผม","e":"我是一个学生。","id":111},{"h":"你","p":"nǐ","t":"คุณ, เธอ","e":"你认识这个人吗？","id":72},{"h":"他","p":"tā","t":"เขา (ผู้ชาย)","e":"他是我们的老师。","id":104},{"h":"她","p":"tā","t":"เขา (ผู้หญิง)","e":"我认识她的妈妈。","id":105},{"h":"我们","p":"wǒmen","t":"พวกเรา","e":"我们都是学生。","id":112},{"h":"那","p":"nà","t":"นั้น, ที่นั้น","e":"我不认识那个人。","id":69},{"h":"这","p":"zhè","t":"นี่, ที่นี่","e":"这个人是我的同学。","id":142},{"h":"哪","p":"nǎ","t":"ไหน","e":"哪个杯子是你的？","id":67},{"h":"哪儿","p":"nǎr","t":"ที่ไหน","e":"你家在哪儿？","id":68}]},{"name":"คำถาม","emoji":"❓","color":"#3B6D11","words":[{"h":"几","p":"jǐ","t":"กี่, เท่าไหร่","e":"你有几个儿子？","id":43},{"h":"多少","p":"duōshao","t":"เท่าไหร่","e":"你们学校有多少学生？","id":25},{"h":"谁","p":"shéi","t":"ใคร","e":"那个人是谁？","id":91},{"h":"什么","p":"shénme","t":"อะไร","e":"你看见了什么？","id":92},{"h":"怎么","p":"zěnme","t":"อย่างไร","e":"你怎么去北京？","id":140},{"h":"怎么样","p":"zěnmeyàng","t":"เป็นอย่างไร","e":"我们去看电影，怎么样？","id":141},{"h":"吗","p":"ma","t":"ไหม หรือไม่ (ใช้ในประโยคคำถาม)","e":"你是中国人吗？","id":60},{"h":"呢","p":"ne","t":"ใส่ไว้ท้ายประโยคคำถาม","e":"你们家有几个人呢？","id":70}]},{"name":"อาชีพ & บุคคลในสังคม","emoji":"👥","color":"#0F6E56","words":[{"h":"老师","p":"lǎoshī","t":"ครู","e":"他就是我们的汉语老师。","id":53},{"h":"学生","p":"xuésheng","t":"นักเรียน","e":"我们学校里的学生很多。","id":127},{"h":"医生","p":"yīshēng","t":"หมอ","e":"他是这个医院里的医生。","id":133},{"h":"先生","p":"xiānsheng","t":"คุณ (ผู้ชาย)","e":"你也认识王先生？","id":118},{"h":"小姐","p":"xiǎojiě","t":"คุณ (ผู้หญิง)","e":"小姐，你叫什么名字？","id":122},{"h":"同学","p":"tóngxué","t":"เพื่อนนักเรียน","e":"同学们，你们好！","id":109},{"h":"朋友","p":"péngyou","t":"เพื่อน","e":"他是我的好朋友。","id":75},{"h":"人","p":"rén","t":"คน","e":"商店里有很多人。","id":84},{"h":"喂","p":"wèi","t":"ฮัลโหล","e":"喂，李老师在吗？","id":110}]},{"name":"แนะนำตัว","emoji":"👋","color":"#185FA5","words":[{"h":"叫","p":"jiào","t":"ชื่อว่า","e":"我的名字叫李明。","id":45},{"h":"名字","p":"míngzi","t":"ชื่อ","e":"我的名字叫李明。","id":66},{"h":"认识","p":"rènshi","t":"รู้จัก","e":"认识你很高兴。","id":85}]},{"name":"อาหาร & เครื่องดื่ม","emoji":"🍜","color":"#854F0B","words":[{"h":"菜","p":"cài","t":"ผัก, กับข้าว","e":"我去超市买点儿菜。","id":9},{"h":"茶","p":"chá","t":"น้ำชา, ใบชา","e":"请喝杯茶吧。","id":10},{"h":"米饭","p":"mǐfàn","t":"ข้าวสวย","e":"我爱吃米饭。","id":64},{"h":"苹果","p":"píngguǒ","t":"แอปเปิ้ล","e":"你想不想吃个苹果？","id":77},{"h":"水果","p":"shuǐguǒ","t":"ผลไม้","e":"我想去商店买水果。","id":98},{"h":"吃","p":"chī","t":"กิน","e":"请吃点儿米饭。","id":11},{"h":"喝","p":"hē","t":"ดื่ม","e":"我想喝水。","id":37}]},{"name":"สถานที่","emoji":"📍","color":"#534AB7","words":[{"h":"北京","p":"Běijīng","t":"ปักกิ่ง","e":"我住在北京。","id":5},{"h":"饭店","p":"fàndiàn","t":"ร้านอาหาร, โรงแรม","e":"中午我们去饭店吃吧。","id":28},{"h":"商店","p":"shāngdiàn","t":"ร้านค้า","e":"她去商店买东西了。","id":87},{"h":"学校","p":"xuéxiào","t":"โรงเรียน","e":"我们学校很大。","id":129},{"h":"医院","p":"yīyuàn","t":"โรงพยาบาล","e":"这是一个大医院。","id":134},{"h":"家","p":"jiā","t":"บ้าน, ครอบครัว","e":"我家在北京。","id":44},{"h":"中国","p":"Zhōngguó","t":"ประเทศจีน","e":"我在中国学汉语。","id":143},{"h":"汉语","p":"Hànyǔ","t":"ภาษาจีน","e":"他在学习汉语。","id":34}]},{"name":"ทิศทาง & ตำแหน่ง","emoji":"🧭","color":"#993C1D","words":[{"h":"后面","p":"hòumiàn","t":"ด้านหลัง","e":"商店在学校后面。","id":40},{"h":"前面","p":"qiánmiàn","t":"ด้านหน้า","e":"前面那个人是我的同学。","id":80},{"h":"上","p":"shàng","t":"ด้านบน","e":"水果在桌子上。","id":88},{"h":"下","p":"xià","t":"ด้านล่าง, ถัดไป","e":"小猫在桌子下面。","id":115},{"h":"里","p":"lǐ","t":"ใน","e":"我们都在学校里。","id":56}]},{"name":"ของใช้ & เทคโนโลยี","emoji":"💻","color":"#3B6D11","words":[{"h":"电脑","p":"diànnǎo","t":"คอมพิวเตอร์","e":"我买了个电脑。","id":17},{"h":"电视","p":"diànshì","t":"โทรทัศน์","e":"妈妈在看电视。","id":18},{"h":"电影","p":"diànyǐng","t":"ภาพยนตร์","e":"我喜欢看电影。","id":19},{"h":"打电话","p":"dǎ diànhuà","t":"โทรศัพท์","e":"他在打电话呢。","id":13},{"h":"杯子","p":"bēizi","t":"ถ้วย, แก้ว","e":"杯子里有茶。","id":4},{"h":"书","p":"shū","t":"หนังสือ","e":"我喜欢读书。","id":96},{"h":"桌子","p":"zhuōzi","t":"โต๊ะ","e":"电脑在桌子上。","id":146},{"h":"椅子","p":"yǐzi","t":"เก้าอี้","e":"小狗在椅子下面呢。","id":135},{"h":"衣服","p":"yīfu","t":"เสื้อผ้า","e":"我在商店买了很多衣服。","id":132}]},{"name":"การเดินทาง","emoji":"🚕","color":"#0F6E56","words":[{"h":"出租车","p":"chūzūchē","t":"รถแท็กซี่","e":"我们坐出租车去火车站。","id":12},{"h":"飞机","p":"fēijī","t":"เครื่องบิน","e":"我坐飞机去北京。","id":29},{"h":"去","p":"qù","t":"ไป","e":"我星期三去中国。","id":82},{"h":"回","p":"huí","t":"กลับ","e":"我八点回家。","id":41},{"h":"在","p":"zài","t":"อยู่ที่","e":"书在桌子上。","id":139},{"h":"住","p":"zhù","t":"อยู่, อาศัย","e":"他在北京住了很多年。","id":145},{"h":"坐","p":"zuò","t":"นั่ง, โดยสาร","e":"我坐飞机去中国。","id":149}]},{"name":"อารมณ์ & ความรู้สึก","emoji":"😊","color":"#185FA5","words":[{"h":"爱","p":"ài","t":"รัก, ชอบ","e":"妈妈，我爱你。","id":1},{"h":"高兴","p":"gāoxìng","t":"ดีใจ","e":"今天我很高兴。","id":31},{"h":"漂亮","p":"piàoliang","t":"สวย","e":"你的衣服真漂亮。","id":76},{"h":"喜欢","p":"xǐhuan","t":"ชอบ","e":"我喜欢学汉语。","id":114},{"h":"太","p":"tài","t":"มากเกิน","e":"这个学校太大了。","id":106},{"h":"小","p":"xiǎo","t":"เล็ก","e":"这个苹果太小了。","id":121}]},{"name":"สภาพอากาศ","emoji":"☀️","color":"#854F0B","words":[{"h":"天气","p":"tiānqì","t":"อากาศ","e":"今天的天气非常好。","id":107},{"h":"热","p":"rè","t":"ร้อน","e":"今天很热。","id":83},{"h":"冷","p":"lěng","t":"หนาว","e":"今天太冷了。","id":55}]},{"name":"คำทักทาย & มารยาท","emoji":"🙏","color":"#534AB7","words":[{"h":"不客气","p":"bú kàqi","t":"ไม่เป็นไร (ตอบรับเมื่ออีกฝ่ายขอบคุณ)","e":"甲：谢谢你！乙：不客气。","id":7},{"h":"对不起","p":"duìbuqǐ","t":"ขอโทษ","e":"甲：对不起。乙：没关系。","id":23},{"h":"没关系","p":"méi guānxi","t":"ไม่เป็นไร (ตอบรับเมื่ออีกฝ่ายขอโทษ)","e":"甲：对不起！乙：没关系。","id":62},{"h":"谢谢","p":"xièxie","t":"ขอบคุณ, ขอบใจ","e":"甲：谢谢你。乙：不客气！","id":125},{"h":"再见","p":"zàijiàn","t":"ลาก่อน","e":"妈妈，我去学校了，再见。","id":138},{"h":"好","p":"hǎo","t":"ดี","e":"今天天气很好。","id":35}]},{"name":"กริยา (สื่อสาร/รับรู้)","emoji":"💬","color":"#993C1D","words":[{"h":"写","p":"xiě","t":"เขียน","e":"你写的字很漂亮。","id":124},{"h":"说","p":"shuō","t":"พูด","e":"你在说什么？","id":100},{"h":"说话","p":"shuōhuà","t":"พูดคุย","e":"他们在说话。","id":101},{"h":"听","p":"tīng","t":"ฟัง","e":"你听，谁来了？","id":108},{"h":"读","p":"dú","t":"อ่าน","e":"你会读这个汉字吗？","id":22},{"h":"请","p":"qǐng","t":"เชิญ","e":"请坐在椅子上。","id":81},{"h":"看","p":"kàn","t":"ดู, มอง, อ่าน","e":"你看，那本书在桌子上呢。","id":49},{"h":"是","p":"shì","t":"เป็น, คือ","e":"他不是学生。","id":95}]},{"name":"กริยา (ทั่วไป)","emoji":"🏃","color":"#3B6D11","words":[{"h":"买","p":"mǎi","t":"ซื้อ","e":"我买了一些苹果。","id":61},{"h":"开","p":"kāi","t":"ขับ (รถ)","e":"我开了三年出租车了。","id":48},{"h":"睡觉","p":"shuìjiào","t":"นอน, หลับ","e":"儿子在睡觉呢。","id":99},{"h":"会","p":"huì","t":"เป็น, สามารถ","e":"我会开车。","id":42},{"h":"能","p":"néng","t":"สามารถ, ได้","e":"我能坐在这儿吗？","id":71},{"h":"想","p":"xiǎng","t":"อยาก, คิด","e":"我想星期六去北京。","id":120},{"h":"有","p":"yǒu","t":"มี","e":"我有一个女儿。","id":136},{"h":"不","p":"bù","t":"ไม่","e":"我不是学生。","id":8}]},{"name":"เงิน & การซื้อขาย","emoji":"💰","color":"#0F6E56","words":[{"h":"块","p":"kuài","t":"หยวน","e":"这本书三十块钱。","id":51},{"h":"钱","p":"qián","t":"เงิน","e":"一个苹果三块钱。","id":79},{"h":"多","p":"duō","t":"มาก","e":"这里的人很多。","id":24},{"h":"少","p":"shǎo","t":"น้อย","e":"杯子里的水很少。","id":90}]},{"name":"ลักษณนาม & ปริมาณ","emoji":"🔣","color":"#185FA5","words":[{"h":"本","p":"běn","t":"เล่ม","e":"桌子上有一本书。","id":6},{"h":"个","p":"gè","t":"คน, อัน (ลักษณนาม)","e":"我是一个学生。","id":32},{"h":"分钟","p":"fēnzhōng","t":"นาที","e":"我想休息几分钟。","id":30},{"h":"一点儿","p":"yīdiǎnr","t":"เล็กน้อย","e":"我只有一点儿钱。","id":131},{"h":"些","p":"xiē","t":"เล็กน้อย, บ้าง","e":"我买了些苹果。","id":123},{"h":"的","p":"de","t":"ของ","e":"这是我的书。","id":15}]},{"name":"คำเชื่อม & คำขยาย","emoji":"🔗","color":"#854F0B","words":[{"h":"都","p":"dōu","t":"ทุกคน, ทั้งหมด, ล้วน","e":"我们都来了。","id":21},{"h":"和","p":"hé","t":"และ, กับ","e":"爸爸和妈妈都在家。","id":38},{"h":"很","p":"hěn","t":"มาก","e":"李小姐很漂亮。","id":39},{"h":"了","p":"le","t":"แล้ว","e":"昨天下雨了。","id":54},{"h":"大","p":"dà","t":"ใหญ่","e":"这个苹果很大。","id":14},{"h":"来","p":"lái","t":"มา","e":"他是昨天来这儿的。","id":52},{"h":"工作","p":"gōngzuò","t":"งาน, ทำงาน","e":"我很喜欢现在的工作。","id":33},{"h":"岁","p":"suì","t":"ปี(ใช้ในการแสดงอายุ)","e":"李医生今年40岁。","id":103},{"h":"字","p":"zì","t":"ตัวอักษร","e":"这个字你认识吗？","id":147},{"h":"看见","p":"kànjiàn","t":"เห็น","e":"我没看见他。","id":50},{"h":"水","p":"shuǐ","t":"น้ำ","e":"杯子里还有水吗？","id":97},{"h":"做","p":"zuò","t":"ทำ, ประกอบอาชีพ","e":"今天妈妈做了很多菜。","id":150},{"h":"没有","p":"méiyǒu","t":"ไม่มี, ไม่เท่า","e":"我家里没有人。","id":63},{"h":"学习","p":"xuéxí","t":"เรียน","e":"你喜欢学习汉语吗？","id":128},{"h":"东西","p":"dōngxi","t":"สิ่งของ","e":"我在商店买了很多东西。","id":20}]}];
+var ALL = [];
+GROUPS.forEach(function(g){ g.words.forEach(function(w){ w.cat = g.name; w.emoji = g.emoji; w.color = g.color; ALL.push(w); }); });
+
+var STATUS_KEY = "wave_hsk1_status_v1";
+function loadStatus(){ try { return JSON.parse(localStorage.getItem(STATUS_KEY)) || {}; } catch(e){ return {}; } }
+function saveStatus(s){ try { localStorage.setItem(STATUS_KEY, JSON.stringify(s)); } catch(e){} }
+var wordStatus = loadStatus();
+
+var mode = "fc";
+var scope = "all"; // "all" | "cat"
+var curCatIdx = 0;
+var statusFilter = "all";
+var fcDeck=[], fcIdx=0, fcFlipped=false;
+var dtDeck=[], dtIdx=0, dtSpd=0.7;
+var sessionGood=0, sessionMiss=0;
+
+function init(){
+  buildCatGrid();
+  resetAll();
+}
+
+function buildCatGrid(){
+  var c = document.getElementById("cat-grid");
+  c.innerHTML = "";
+  GROUPS.forEach(function(g,i){
+    var d = document.createElement("div");
+    d.className = "cat-chip" + (i===curCatIdx ? " on" : "");
+    if (i===curCatIdx) d.style.borderColor = g.color;
+    d.innerHTML = '<span class="cat-emoji">'+g.emoji+'</span>'+g.name+' ('+g.words.length+')';
+    d.onclick = (function(idx){ return function(){ selectCat(idx); }; })(i);
+    c.appendChild(d);
+  });
+}
+
+function selectCat(idx){
+  curCatIdx = idx;
+  buildCatGrid();
+  resetAll();
+}
+
+function setScope(s){
+  scope = s;
+  document.getElementById("sc-all").className = "sctab" + (s==="all" ? " on" : "");
+  document.getElementById("sc-cat").className = "sctab" + (s==="cat" ? " on" : "");
+  document.getElementById("cat-picker").className = "cat-picker" + (s==="cat" ? " show" : "");
+  resetAll();
+}
+
+function setStatusFilter(f, el){
+  statusFilter = f;
+  document.querySelectorAll(".fstab").forEach(function(t){ t.classList.remove("on"); });
+  el.classList.add("on");
+  resetAll();
+}
+
+function getScopeWords(){
+  return scope === "all" ? ALL : GROUPS[curCatIdx].words;
+}
+
+function getFilteredWords(){
+  var words = getScopeWords();
+  if (statusFilter === "all") return words.slice();
+  if (statusFilter === "new") return words.filter(function(w){ return !wordStatus[w.id]; });
+  if (statusFilter === "no") return words.filter(function(w){ return wordStatus[w.id]===1 || wordStatus[w.id]===2; });
+  if (statusFilter === "yes") return words.filter(function(w){ return wordStatus[w.id]===3; });
+  return words.slice();
+}
+
+function resetAll(){
+  sessionGood=0; sessionMiss=0; fcIdx=0; dtIdx=0;
+  fcDeck = getFilteredWords();
+  dtDeck = shuffle(getFilteredWords().slice());
+  hideDone();
+  if (mode==="fc") showFC(); else showDTFront();
+  updateGlobalStats();
+}
+
+function switchMode(m){
+  mode=m;
+  document.getElementById("tab-fc").className="mtab"+(m==="fc"?" on":"");
+  document.getElementById("tab-dt").className="mtab"+(m==="dt"?" on":"");
+  document.getElementById("fc-area").style.display=m==="fc"?"block":"none";
+  document.getElementById("dt-area").style.display=m==="dt"?"block":"none";
+  document.getElementById("top-badge").textContent=m==="fc"?"Flashcard":"เขียนตามคำบอก";
+  hideDone();
+  resetAll();
+}
+
+function hideDone(){ document.getElementById("done-scr").className="done-scr"; }
+
+function updateGlobalStats(){
+  var scopeWords = getScopeWords();
+  var nNew=0,nNo=0,nYes=0;
+  scopeWords.forEach(function(w){
+    var st = wordStatus[w.id];
+    if (!st) nNew++; else if (st===3) nYes++; else nNo++;
+  });
+  document.getElementById("s-new").textContent = nNew;
+  document.getElementById("s-no").textContent = nNo;
+  document.getElementById("s-yes").textContent = nYes;
+  var pct = scopeWords.length>0 ? Math.round(nYes/scopeWords.length*100) : 0;
+  document.getElementById("s-pct").textContent = pct + "%";
+
+  var deck = mode==="fc" ? fcDeck : dtDeck;
+  var idx = mode==="fc" ? fcIdx : dtIdx;
+  var progPct = deck.length>0 ? Math.round(idx/deck.length*100) : 0;
+  document.getElementById("prog").style.width = progPct + "%";
+  document.getElementById("fc-idx").textContent = (Math.min(fcIdx+1,fcDeck.length)) + " / " + fcDeck.length;
+  document.getElementById("dt-round-lbl").textContent = "ข้อ " + (Math.min(dtIdx+1,dtDeck.length)) + " / " + dtDeck.length;
+  document.getElementById("rv-num").textContent = "ข้อ " + (Math.min(dtIdx+1,dtDeck.length)) + " / " + dtDeck.length;
+}
+
+function statusPillInfo(id){
+  var st = wordStatus[id];
+  if (!st) return {cls:"sp-new", txt:"ยังไม่เรียน"};
+  if (st===3) return {cls:"sp-yes", txt:"จำได้แล้ว"};
+  return {cls:"sp-no", txt:"จำไม่ได้"};
+}
+
+function showFC(){
+  if (fcIdx >= fcDeck.length){ showDone("fc"); return; }
+  var w = fcDeck[fcIdx];
+  document.getElementById("fc-th").textContent = w.t;
+  document.getElementById("fc-hanzi").textContent = w.h;
+  document.getElementById("fc-pinyin").textContent = w.p;
+  document.getElementById("fc-meaning").textContent = w.t;
+  document.getElementById("fc-example").textContent = w.e;
+  document.getElementById("fc-card").classList.remove("flipped");
+  fcFlipped=false;
+  document.getElementById("ans-row").style.display="none";
+  var pill = statusPillInfo(w.id);
+  var pe = document.getElementById("fc-status-pill");
+  pe.className = "status-pill " + pill.cls; pe.textContent = pill.txt;
+  var ce = document.getElementById("fc-cat-pill");
+  ce.textContent = w.emoji + " " + w.cat;
+  updateGlobalStats();
+}
+
+function flipCard(){
+  if (fcFlipped) return;
+  fcFlipped=true;
+  document.getElementById("fc-card").classList.add("flipped");
+  document.getElementById("ans-row").style.display="grid";
+  speak(fcDeck[fcIdx].h);
+}
+
+function speakCurr(e){ e.stopPropagation(); if (fcDeck[fcIdx]) speak(fcDeck[fcIdx].h); }
+
+function setStatus(level){
+  var w = fcDeck[fcIdx];
+  wordStatus[w.id]=level; saveStatus(wordStatus);
+  if (level===3) sessionGood++; else sessionMiss++;
+  fcIdx++;
+  if (fcIdx>=fcDeck.length) showDone("fc"); else showFC();
+  updateGlobalStats();
+}
+
+function nextCard(){ if (fcIdx<fcDeck.length-1){ fcIdx++; showFC(); } }
+function prevCard(){ if (fcIdx>0){ fcIdx--; showFC(); } }
+
+function showDTFront(){
+  if (dtIdx >= dtDeck.length){ showDone("dt"); return; }
+  var w = dtDeck[dtIdx];
+  document.getElementById("dt-front").style.display="block";
+  document.getElementById("dt-back").style.display="none";
+  var pill = statusPillInfo(w.id);
+  var pe = document.getElementById("dt-status-pill");
+  pe.className = "status-pill " + pill.cls; pe.textContent = pill.txt;
+  var ce = document.getElementById("dt-cat-pill");
+  ce.textContent = w.emoji + " " + w.cat;
+  updateGlobalStats();
+  setTimeout(function(){ speak(w.h, dtSpd); }, 350);
+}
+
+function dtPlay(){
+  if (!dtDeck[dtIdx]) return;
+  var btn = document.getElementById("dt-play-btn");
+  btn.classList.add("playing");
+  setTimeout(function(){ btn.classList.remove("playing"); }, 1200);
+  speak(dtDeck[dtIdx].h, dtSpd);
+}
+
+function setSpd(s, el){
+  dtSpd=s;
+  document.querySelectorAll(".spd-btn").forEach(function(b){ b.className="spd-btn"; });
+  el.className="spd-btn on";
+}
+
+function dtReveal(){
+  var w = dtDeck[dtIdx];
+  document.getElementById("rv-hanzi").textContent=w.h;
+  document.getElementById("rv-pinyin").textContent=w.p;
+  document.getElementById("rv-th").textContent=w.t;
+  document.getElementById("dt-front").style.display="none";
+  document.getElementById("dt-back").style.display="block";
+  speak(w.h, dtSpd);
+}
+
+function dtAnswer(correct){
+  var w = dtDeck[dtIdx];
+  wordStatus[w.id] = correct?3:1; saveStatus(wordStatus);
+  if (correct) sessionGood++; else sessionMiss++;
+  dtIdx++;
+  if (dtIdx>=dtDeck.length){ showDone("dt"); return; }
+  showDTFront();
+  updateGlobalStats();
+}
+
+function showDone(m){
+  var total = m==="fc" ? fcDeck.length : dtDeck.length;
+  var pct = total>0 ? Math.round(sessionGood/total*100) : 0;
+  document.getElementById("done-title").textContent = pct>=80?"🎉 เก่งมาก!":pct>=60?"👍 ดีมาก!":"💪 ฝึกต่อไป!";
+  var scopeLabel = scope==="all" ? "รวมทั้งหมด 150 คำ" : GROUPS[curCatIdx].name;
+  document.getElementById("done-sub").textContent = (m==="fc"?"Flashcard":"เขียนตามคำบอก")+" — "+scopeLabel+" — แม่นยำ "+pct+"%";
+  document.getElementById("done-good").textContent = sessionGood;
+  document.getElementById("done-miss").textContent = sessionMiss;
+  document.getElementById("done-pct").textContent = pct+"%";
+  document.getElementById("done-scr").className = "done-scr show";
+}
+
+function restartCurrent(){ hideDone(); resetAll(); }
+
+function speak(text, rate){
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang="zh-CN"; u.rate=rate||0.85; u.pitch=1;
+  window.speechSynthesis.speak(u);
+}
+
+function shuffle(arr){
+  for (var i=arr.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=arr[i];arr[i]=arr[j];arr[j]=t; }
+  return arr;
+}
+
+document.addEventListener("keydown", function(e){
+  if (mode==="fc"){
+    if (e.key===" " && !fcFlipped){ e.preventDefault(); flipCard(); }
+    else if (e.key==="1" && fcFlipped) setStatus(1);
+    else if (e.key==="2" && fcFlipped) setStatus(2);
+    else if (e.key==="3" && fcFlipped) setStatus(3);
+  } else {
+    if (e.key==="Enter"){
+      var back = document.getElementById("dt-back").style.display;
+      if (back==="none") dtReveal();
+    }
+    if (e.key===" "){ e.preventDefault(); dtPlay(); }
+  }
+});
+
+init();
+</script>
+</body>
+</html>
