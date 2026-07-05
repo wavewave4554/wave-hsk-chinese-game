@@ -22,20 +22,12 @@ body{font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;background:#f5f4f0;m
 .logo{font-size:14px;font-weight:600;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hdr-right{display:flex;gap:6px;flex:none}
 .streak-pill{background:#FAEEDA;color:#854F0B;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px}
-.level-pill{background:#111;color:white;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px}
 
 .view{display:none}
 .view.active{display:block}
 
 /* HOME */
-.xp-card{background:white;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
-.xp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.xp-top #lvl-label{font-size:15px;font-weight:700;color:#111}
-.xp-top #xp-label{font-size:12px;color:#888}
-.xp-bar-wrap{background:#e8e6e0;border-radius:6px;height:8px;overflow:hidden}
-.xp-bar-fill{height:8px;background:linear-gradient(90deg,#1D9E75,#0F6E56);border-radius:6px;transition:width .4s}
-
-.today-card{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.today-card{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
 .today-stat{background:white;border-radius:12px;padding:12px 6px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.04)}
 .today-n{font-size:20px;font-weight:700;color:#111}
 .today-l{font-size:10px;color:#888;margin-top:2px}
@@ -50,7 +42,6 @@ body{font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;background:#f5f4f0;m
 .board-section{margin-bottom:10px}
 .board-title{font-size:12px;font-weight:700;color:#666;margin-bottom:8px;letter-spacing:.02em}
 .board-row{display:flex;align-items:center;gap:10px;background:white;border-radius:12px;padding:9px 12px;margin-bottom:6px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
-.board-row.locked{opacity:.55}
 .board-emoji{font-size:17px;flex:none;width:22px;text-align:center}
 .board-info{flex:1;min-width:0}
 .board-name{font-size:11.5px;font-weight:600;color:#333;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -69,7 +60,6 @@ body{font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;background:#f5f4f0;m
 .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:180px;overflow-y:auto;padding:2px}
 .cat-chip{background:white;border:1.5px solid #e0ddd6;border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;font-size:10px;font-weight:500;color:#555}
 .cat-chip.on{border-width:2px}
-.cat-chip.locked{color:#bbb;cursor:not-allowed}
 .cat-emoji{font-size:16px;display:block;margin-bottom:2px}
 .status-tabs{display:flex;gap:5px;margin-top:10px}
 .fstab{flex:1;text-align:center;font-size:11px;padding:7px 4px;border-radius:8px;border:1.5px solid #ddd;background:white;color:#666;cursor:pointer;font-weight:500}
@@ -207,19 +197,13 @@ body{font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;background:#f5f4f0;m
     </div>
     <div class="hdr-right">
       <span class="streak-pill" id="streak-pill">🔥0</span>
-      <span class="level-pill" id="level-pill">Lv.1</span>
     </div>
   </div>
 
   <!-- HOME -->
   <div class="view active" id="view-home">
-    <div class="xp-card">
-      <div class="xp-top"><span id="lvl-label">Level 1</span><span id="xp-label">0 / 100 XP</span></div>
-      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
-    </div>
     <div class="today-card">
       <div class="today-stat"><div class="today-n" id="today-learned">0</div><div class="today-l">จำได้วันนี้</div></div>
-      <div class="today-stat"><div class="today-n" id="today-xp">0</div><div class="today-l">XP วันนี้</div></div>
       <div class="today-stat"><div class="today-n" id="today-streak">0</div><div class="today-l">🔥 วันติดกัน</div></div>
     </div>
     <div class="mode-grid">
@@ -240,7 +224,7 @@ body{font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;background:#f5f4f0;m
   <div class="view" id="view-learn">
     <div class="section-card">
       <div class="scope-tabs">
-        <div class="sctab" id="learn-sc-all" onclick="learnSetScope('all')">🌐 ทุกหมวดที่ปลดล็อก</div>
+        <div class="sctab" id="learn-sc-all" onclick="learnSetScope('all')">🌐 ทุกหมวด</div>
         <div class="sctab" id="learn-sc-cat" onclick="learnSetScope('cat')">🗂 แยกตามหมวด</div>
       </div>
       <div class="cat-picker" id="learn-cat-picker"><div class="cat-label">เลือกหมวด</div><div class="cat-grid" id="learn-cat-grid"></div></div>
@@ -280,7 +264,7 @@ body{font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;background:#f5f4f0;m
   <div class="view" id="view-quiz">
     <div class="section-card" id="quiz-setup">
       <div class="scope-tabs">
-        <div class="sctab" id="quiz-sc-all" onclick="quizSetScope('all')">🌐 ทุกหมวดที่ปลดล็อก</div>
+        <div class="sctab" id="quiz-sc-all" onclick="quizSetScope('all')">🌐 ทุกหมวด</div>
         <div class="sctab" id="quiz-sc-cat" onclick="quizSetScope('cat')">🗂 แยกตามหมวด</div>
       </div>
       <div class="cat-picker" id="quiz-cat-picker"><div class="cat-label">เลือกหมวด</div><div class="cat-grid" id="quiz-cat-grid"></div></div>
@@ -311,7 +295,7 @@ body{font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;background:#f5f4f0;m
   <div class="view" id="view-dictate">
     <div class="section-card" id="dictate-setup">
       <div class="scope-tabs">
-        <div class="sctab" id="dictate-sc-all" onclick="dictateSetScope('all')">🌐 ทุกหมวดที่ปลดล็อก</div>
+        <div class="sctab" id="dictate-sc-all" onclick="dictateSetScope('all')">🌐 ทุกหมวด</div>
         <div class="sctab" id="dictate-sc-cat" onclick="dictateSetScope('cat')">🗂 แยกตามหมวด</div>
       </div>
       <div class="cat-picker" id="dictate-cat-picker"><div class="cat-label">เลือกหมวด</div><div class="cat-grid" id="dictate-cat-grid"></div></div>
@@ -452,18 +436,11 @@ function saveJSON(key, val){ try { localStorage.setItem(key, JSON.stringify(val)
 var wordStatus = loadJSON(STATUS_KEY, {});
 function saveStatus(){ saveJSON(STATUS_KEY, wordStatus); }
 
-var defaultProfile = { xp:0, streak:0, lastActive:"", unlockedCats:[0], dailyLog:{} };
+var defaultProfile = { streak:0, lastActive:"", dailyLog:{} };
 var profile = loadJSON(PROFILE_KEY, defaultProfile);
 if (!profile.dailyLog) profile.dailyLog = {};
-if (!profile.unlockedCats || !profile.unlockedCats.length) profile.unlockedCats = [0];
 function saveProfile(){ saveJSON(PROFILE_KEY, profile); }
 
-var LEVEL_THRESH = [0,100,250,450,700,1000,1400,1900,2500,3200];
-function levelFromXP(xp){
-  var lvl = 1;
-  for (var i=1;i<LEVEL_THRESH.length;i++){ if (xp >= LEVEL_THRESH[i]) lvl = i+1; }
-  return Math.min(lvl,10);
-}
 function pad2(n){ return n<10 ? "0"+n : ""+n; }
 function todayStr(){ var d=new Date(); return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
 function yesterdayStr(){ var d=new Date(); d.setDate(d.getDate()-1); return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
@@ -478,14 +455,8 @@ function touchStreak(){
 }
 function todayLog(){
   var t = todayStr();
-  if (!profile.dailyLog[t]) profile.dailyLog[t] = { xp:0, learnedIds:[] };
+  if (!profile.dailyLog[t]) profile.dailyLog[t] = { learnedIds:[] };
   return profile.dailyLog[t];
-}
-function addXP(n){
-  profile.xp += n;
-  todayLog().xp += n;
-  saveProfile();
-  refreshHeader();
 }
 function markLearned(id){
   var log = todayLog();
@@ -496,7 +467,6 @@ function setWordStatus(id, status){
   wordStatus[id] = status;
   saveStatus();
   if (status === 3) markLearned(id);
-  recomputeUnlocks();
 }
 function categoryPct(gi){
   var words = HSK2_GROUPS[gi].words;
@@ -504,24 +474,13 @@ function categoryPct(gi){
   words.forEach(function(w){ if (wordStatus[w.id]===3) done++; });
   return words.length ? Math.round(done/words.length*100) : 0;
 }
-function recomputeUnlocks(){
-  var changed = false;
-  for (var i=0;i<HSK2_GROUPS.length-1;i++){
-    if (profile.unlockedCats.indexOf(i)>=0 && categoryPct(i)>=80 && profile.unlockedCats.indexOf(i+1)<0){
-      profile.unlockedCats.push(i+1);
-      changed = true;
-      showToast("🎉 ปลดล็อกหมวดใหม่: " + HSK2_GROUPS[i+1].emoji + " " + HSK2_GROUPS[i+1].name);
-    }
-  }
-  if (changed) saveProfile();
-}
-function getUnlockedAllWords(){
+function getAllHSK2Words(){
   var arr = [];
-  HSK2_GROUPS.forEach(function(g,i){ if (profile.unlockedCats.indexOf(i)>=0) arr = arr.concat(g.words); });
+  HSK2_GROUPS.forEach(function(g){ arr = arr.concat(g.words); });
   return arr;
 }
 function getScopeWords(scopeObj){
-  return scopeObj.scope === "all" ? getUnlockedAllWords() : HSK2_GROUPS[scopeObj.cat].words;
+  return scopeObj.scope === "all" ? getAllHSK2Words() : HSK2_GROUPS[scopeObj.cat].words;
 }
 function filterByStatus(words, filter){
   if (filter === "new") return words.filter(function(w){ return !wordStatus[w.id]; });
@@ -595,20 +554,10 @@ function openMode(m){
 
 function refreshHeader(){
   el("streak-pill").textContent = "🔥" + (profile.streak||0);
-  el("level-pill").textContent = "Lv." + levelFromXP(profile.xp);
 }
 function refreshHome(){
-  var lvl = levelFromXP(profile.xp);
-  var cur = LEVEL_THRESH[lvl-1];
-  var next = lvl<10 ? LEVEL_THRESH[lvl] : LEVEL_THRESH[9];
-  var span = (next-cur) || 1;
-  var pct = lvl>=10 ? 100 : Math.max(0,Math.min(100, Math.round((profile.xp-cur)/span*100)));
-  el("lvl-label").textContent = "Level " + lvl;
-  el("xp-label").textContent = profile.xp + " / " + next + " XP";
-  el("xp-bar").style.width = pct + "%";
   var log = todayLog();
   el("today-learned").textContent = log.learnedIds.length;
-  el("today-xp").textContent = log.xp;
   el("today-streak").textContent = profile.streak||0;
   renderCatBoard();
   refreshHeader();
@@ -616,37 +565,34 @@ function refreshHome(){
 function renderCatBoard(){
   var html = "";
   HSK2_GROUPS.forEach(function(g,i){
-    var unlocked = profile.unlockedCats.indexOf(i)>=0;
-    var pct = unlocked ? categoryPct(i) : 0;
-    html += '<div class="board-row'+(unlocked?"":" locked")+'">'
-      + '<div class="board-emoji">'+(unlocked?g.emoji:"🔒")+'</div>'
+    var pct = categoryPct(i);
+    html += '<div class="board-row">'
+      + '<div class="board-emoji">'+g.emoji+'</div>'
       + '<div class="board-info"><div class="board-name">'+g.name+'</div>'
       + '<div class="board-bar-wrap"><div class="board-bar-fill" style="width:'+pct+'%;background:'+g.color+'"></div></div></div>'
-      + '<div class="board-pct">'+(unlocked?pct+"%":"—")+'</div></div>';
+      + '<div class="board-pct">'+pct+'%</div></div>';
   });
   el("cat-board").innerHTML = html;
 }
 
-/* generic category grid renderer (HSK2, respects unlock) */
+/* generic category grid renderer (HSK2, all categories always available) */
 function renderCatGrid(containerId, selectedIdx, singleMode, onSelect){
   var c = el(containerId);
   var html = "";
   HSK2_GROUPS.forEach(function(g,i){
-    var unlocked = profile.unlockedCats.indexOf(i)>=0;
-    var on = (i===selectedIdx && unlocked);
-    html += '<div class="cat-chip'+(on?" on":"")+(unlocked?"":" locked")+'" data-i="'+i+'" style="'+(on?"border-color:"+g.color:"")+'">'
-      + '<span class="cat-emoji">'+(unlocked?g.emoji:"🔒")+'</span>'+g.name+' ('+g.words.length+')</div>';
+    var on = (i===selectedIdx);
+    html += '<div class="cat-chip'+(on?" on":"")+'" data-i="'+i+'" style="'+(on?"border-color:"+g.color:"")+'">'
+      + '<span class="cat-emoji">'+g.emoji+'</span>'+g.name+' ('+g.words.length+')</div>';
   });
   c.innerHTML = html;
   Array.prototype.forEach.call(c.querySelectorAll(".cat-chip"), function(chip){
     var i = parseInt(chip.getAttribute("data-i"),10);
-    var unlocked = profile.unlockedCats.indexOf(i)>=0;
-    chip.onclick = unlocked ? function(){ onSelect(i); } : function(){ showToast("🔒 ต้องเรียนหมวดก่อนหน้าให้ผ่าน 80% ก่อนถึงจะปลดล็อก"); };
+    chip.onclick = function(){ onSelect(i); };
   });
 }
 
 /* ================= MODE 1: LEARN ================= */
-var learnState = { scope:"all", cat:0, filter:"all", deck:[], idx:0, good:0, miss:0, xp:0 };
+var learnState = { scope:"all", cat:0, filter:"all", deck:[], idx:0, good:0, miss:0 };
 function renderLearnSetup(){
   el("learn-sc-all").className = "sctab" + (learnState.scope==="all"?" on":"");
   el("learn-sc-cat").className = "sctab" + (learnState.scope==="cat"?" on":"");
@@ -667,7 +613,7 @@ function learnStats(){
   el("learn-s-pct").textContent = (scopeWords.length? Math.round(nYes/scopeWords.length*100):0) + "%";
 }
 function learnReset(){
-  learnState.idx=0; learnState.good=0; learnState.miss=0; learnState.xp=0;
+  learnState.idx=0; learnState.good=0; learnState.miss=0;
   learnState.deck = filterByStatus(getScopeWords(learnState), learnState.filter);
   learnStats();
   showLearnCard();
@@ -676,7 +622,7 @@ function showLearnCard(){
   learnStats();
   if (learnState.idx >= learnState.deck.length){
     showDoneOverlay("🎉 เรียนครบแล้ว!", "เรียนคำใหม่ — จำได้ "+learnState.good+" คำ",
-      [{n:learnState.good,l:"จำได้แล้ว",color:"#1D9E75"},{n:learnState.miss,l:"ยังไม่แม่น",color:"#E24B4A"},{n:learnState.xp,l:"XP ที่ได้"}],
+      [{n:learnState.good,l:"จำได้แล้ว",color:"#1D9E75"},{n:learnState.miss,l:"ยังไม่แม่น",color:"#E24B4A"}],
       learnReset);
     return;
   }
@@ -697,8 +643,6 @@ function learnSetStatus(level){
   var w = learnState.deck[learnState.idx];
   if (!w) return;
   setWordStatus(w.id, level);
-  var gain = level===3 ? 3 : 1;
-  addXP(gain); learnState.xp += gain;
   if (level===3) learnState.good++; else learnState.miss++;
   learnState.idx++;
   showLearnCard();
@@ -707,7 +651,7 @@ function learnNext(){ if (learnState.idx < learnState.deck.length-1){ learnState
 function learnPrev(){ if (learnState.idx > 0){ learnState.idx--; showLearnCard(); } }
 
 /* ================= MODE 2: QUIZ ================= */
-var quizState = { scope:"all", cat:0, deck:[], idx:0, correct:0, xp:0, answered:false };
+var quizState = { scope:"all", cat:0, deck:[], idx:0, correct:0, answered:false };
 function renderQuizSetup(){
   el("quiz-sc-all").className = "sctab" + (quizState.scope==="all"?" on":"");
   el("quiz-sc-cat").className = "sctab" + (quizState.scope==="cat"?" on":"");
@@ -727,7 +671,7 @@ function startQuiz(){
     var options = shuffle([w].concat(distractors));
     return { word:w, dir:dir, options:options, correctId:w.id };
   });
-  quizState.idx=0; quizState.correct=0; quizState.xp=0;
+  quizState.idx=0; quizState.correct=0;
   el("quiz-setup").style.display="none";
   el("quiz-play").style.display="block";
   showQuizQuestion();
@@ -736,7 +680,7 @@ function showQuizQuestion(){
   if (quizState.idx >= quizState.deck.length){
     var pct = Math.round(quizState.correct/quizState.deck.length*100);
     showDoneOverlay(pct>=80?"🎉 เก่งมาก!":pct>=60?"👍 ดีมาก!":"💪 ฝึกต่อไป!", "Quiz — แม่นยำ "+pct+"%",
-      [{n:quizState.correct+"/"+quizState.deck.length,l:"ตอบถูก",color:"#1D9E75"},{n:pct+"%",l:"แม่นยำ"},{n:quizState.xp,l:"XP ที่ได้"}],
+      [{n:quizState.correct+"/"+quizState.deck.length,l:"ตอบถูก",color:"#1D9E75"},{n:pct+"%",l:"แม่นยำ"}],
       function(){ el("quiz-play").style.display="none"; el("quiz-setup").style.display="block"; });
     return;
   }
@@ -773,8 +717,6 @@ function answerQuiz(selIdx){
     else if (i===selIdx) b.classList.add("wrong");
   });
   setWordStatus(q.word.id, correct?3:1);
-  var gain = correct?5:1;
-  addXP(gain); quizState.xp += gain;
   if (correct) quizState.correct++;
   if (q.dir==="m2h") speak(q.word.h);
   el("quiz-next-btn").style.display = "block";
@@ -782,7 +724,7 @@ function answerQuiz(selIdx){
 function quizNext(){ quizState.idx++; showQuizQuestion(); }
 
 /* ================= MODE 3: MATCH ================= */
-var matchState = { cat:0, cards:[], flippedIdx:[], matchedCount:0, totalPairs:0, timer:null, startTime:0, xp:0, locked:false };
+var matchState = { cat:0, cards:[], flippedIdx:[], matchedCount:0, totalPairs:0, timer:null, startTime:0, locked:false };
 function renderMatchSetup(){
   renderCatGrid("match-cat-grid", matchState.cat, true, function(i){ matchState.cat=i; renderMatchSetup(); });
 }
@@ -799,7 +741,6 @@ function startMatch(){
   matchState.flippedIdx = [];
   matchState.matchedCount = 0;
   matchState.totalPairs = picks.length;
-  matchState.xp = 0;
   matchState.locked = false;
   matchState.startTime = Date.now();
   el("match-setup").style.display="none";
@@ -840,7 +781,6 @@ function flipMatchCard(i){
       a.matched=true; b.matched=true;
       matchState.flippedIdx=[];
       matchState.matchedCount++;
-      addXP(3); matchState.xp+=3;
       renderMatchGrid();
       if (matchState.matchedCount>=matchState.totalPairs) finishMatch();
     } else {
@@ -852,15 +792,13 @@ function flipMatchCard(i){
 function finishMatch(){
   clearInterval(matchState.timer);
   var sec = Math.floor((Date.now()-matchState.startTime)/1000);
-  var bonus = sec<40?15:(sec<80?8:0);
-  if (bonus>0){ addXP(bonus); matchState.xp+=bonus; }
   showDoneOverlay("🎉 จับคู่ครบแล้ว!", HSK2_GROUPS[matchState.cat].name+" — เวลา "+pad2(Math.floor(sec/60))+":"+pad2(sec%60),
-    [{n:pad2(Math.floor(sec/60))+":"+pad2(sec%60),l:"เวลาที่ใช้"},{n:matchState.totalPairs,l:"คู่ที่จับได้",color:"#1D9E75"},{n:matchState.xp,l:"XP ที่ได้"}],
+    [{n:pad2(Math.floor(sec/60))+":"+pad2(sec%60),l:"เวลาที่ใช้"},{n:matchState.totalPairs,l:"คู่ที่จับได้",color:"#1D9E75"}],
     function(){ el("match-play").style.display="none"; el("match-setup").style.display="block"; });
 }
 
 /* ================= MODE 4: DICTATE ================= */
-var dictateState = { scope:"all", cat:0, deck:[], idx:0, spd:0.7, good:0, miss:0, xp:0 };
+var dictateState = { scope:"all", cat:0, deck:[], idx:0, spd:0.7, good:0, miss:0 };
 function renderDictateSetup(){
   el("dictate-sc-all").className = "sctab" + (dictateState.scope==="all"?" on":"");
   el("dictate-sc-cat").className = "sctab" + (dictateState.scope==="cat"?" on":"");
@@ -872,7 +810,7 @@ function startDictate(){
   var words = getScopeWords(dictateState);
   if (!words.length){ showToast("ไม่มีคำในหมวดนี้"); return; }
   dictateState.deck = shuffle(words.slice());
-  dictateState.idx=0; dictateState.good=0; dictateState.miss=0; dictateState.xp=0;
+  dictateState.idx=0; dictateState.good=0; dictateState.miss=0;
   el("dictate-setup").style.display="none";
   el("dictate-play").style.display="block";
   showDictateFront();
@@ -880,7 +818,7 @@ function startDictate(){
 function showDictateFront(){
   if (dictateState.idx >= dictateState.deck.length){
     showDoneOverlay("🎉 ครบแล้ว!", "เขียนตามคำบอก — จำได้ "+dictateState.good+" คำ",
-      [{n:dictateState.good,l:"เขียนถูก",color:"#1D9E75"},{n:dictateState.miss,l:"เขียนผิด",color:"#E24B4A"},{n:dictateState.xp,l:"XP ที่ได้"}],
+      [{n:dictateState.good,l:"เขียนถูก",color:"#1D9E75"},{n:dictateState.miss,l:"เขียนผิด",color:"#E24B4A"}],
       function(){ el("dictate-play").style.display="none"; el("dictate-setup").style.display="block"; });
     return;
   }
@@ -910,22 +848,19 @@ function dtReveal(){
 function dtAnswer(correct){
   var w = dictateState.deck[dictateState.idx];
   setWordStatus(w.id, correct?3:1);
-  var gain = correct?5:1;
-  addXP(gain); dictateState.xp+=gain;
   if (correct) dictateState.good++; else dictateState.miss++;
   dictateState.idx++;
   showDictateFront();
 }
 
 /* ================= MODE 5: LISTEN ================= */
-var listenState = { level:1, deck:[], idx:0, correct:0, xp:0, replaysUsed:0, answered:false };
+var listenState = { level:1, deck:[], idx:0, correct:0, replaysUsed:0, answered:false };
 function listenSetLevel(l, b){ listenState.level=l; Array.prototype.forEach.call(document.querySelectorAll(".lvltab"), function(x){ x.className="lvltab"; }); b.className="lvltab on"; }
 var LISTEN_RATE = {1:0.75, 2:0.95, 3:1.25};
 var LISTEN_REPLAYS = {1:99, 2:2, 3:1};
-var LISTEN_XP_MULT = {1:1, 2:1.5, 3:2};
 function startListen(){
   listenState.deck = sample(COMBINED_ALL, 10);
-  listenState.idx=0; listenState.correct=0; listenState.xp=0;
+  listenState.idx=0; listenState.correct=0;
   el("listen-setup").style.display="none";
   el("listen-play").style.display="block";
   showListenQuestion();
@@ -934,7 +869,7 @@ function showListenQuestion(){
   if (listenState.idx >= listenState.deck.length){
     var pct = Math.round(listenState.correct/listenState.deck.length*100);
     showDoneOverlay(pct>=80?"🎉 เก่งมาก!":pct>=60?"👍 ดีมาก!":"💪 ฝึกต่อไป!", "ฟังประโยค — แม่นยำ "+pct+"%",
-      [{n:listenState.correct+"/"+listenState.deck.length,l:"ตอบถูก",color:"#1D9E75"},{n:pct+"%",l:"แม่นยำ"},{n:listenState.xp,l:"XP ที่ได้"}],
+      [{n:listenState.correct+"/"+listenState.deck.length,l:"ตอบถูก",color:"#1D9E75"},{n:pct+"%",l:"แม่นยำ"}],
       function(){ el("listen-play").style.display="none"; el("listen-setup").style.display="block"; });
     return;
   }
@@ -986,8 +921,6 @@ function answerListen(btnEl, correct){
     if (b.textContent===w.t) b.classList.add("correct");
     else if (b===btnEl) b.classList.add("wrong");
   });
-  var gain = Math.round((correct?5:1) * LISTEN_XP_MULT[listenState.level]);
-  addXP(gain); listenState.xp += gain;
   if (correct) listenState.correct++;
   if (w.id >= 151) setWordStatus(w.id, correct?3:1);
   el("listen-next-btn").style.display="block";
@@ -995,11 +928,11 @@ function answerListen(btnEl, correct){
 function listenNext(){ listenState.idx++; showListenQuestion(); }
 
 /* ================= MODE 6: ARRANGE ================= */
-var arrangeState = { deck:[], idx:0, tokens:[], bank:[], answer:[], correct:0, xp:0, checked:false };
+var arrangeState = { deck:[], idx:0, tokens:[], bank:[], answer:[], correct:0, checked:false };
 function startArrange(){
   var pool = COMBINED_ALL.filter(function(w){ return w.e && w.e.replace(PUNCT_RE,"").length<=16 && w.e.replace(PUNCT_RE,"").length>=3; });
   arrangeState.deck = sample(pool, Math.min(8, pool.length));
-  arrangeState.idx=0; arrangeState.correct=0; arrangeState.xp=0;
+  arrangeState.idx=0; arrangeState.correct=0;
   el("arrange-setup").style.display="none";
   el("arrange-play").style.display="block";
   showArrangeQuestion();
@@ -1008,7 +941,7 @@ function showArrangeQuestion(){
   if (arrangeState.idx >= arrangeState.deck.length){
     var pct = Math.round(arrangeState.correct/arrangeState.deck.length*100);
     showDoneOverlay(pct>=80?"🎉 เก่งมาก!":pct>=60?"👍 ดีมาก!":"💪 ฝึกต่อไป!", "เรียงประโยค — แม่นยำ "+pct+"%",
-      [{n:arrangeState.correct+"/"+arrangeState.deck.length,l:"ถูกต้อง",color:"#1D9E75"},{n:pct+"%",l:"แม่นยำ"},{n:arrangeState.xp,l:"XP ที่ได้"}],
+      [{n:arrangeState.correct+"/"+arrangeState.deck.length,l:"ถูกต้อง",color:"#1D9E75"},{n:pct+"%",l:"แม่นยำ"}],
       function(){ el("arrange-play").style.display="none"; el("arrange-setup").style.display="block"; });
     return;
   }
@@ -1057,8 +990,6 @@ function arrCheck(){
     el("arr-reveal").style.display="block";
     el("arr-reveal").innerHTML = "เฉลย: <b>" + arrangeState.tokens.join(" ") + "</b><br>" + w.e;
   }
-  var gain = isCorrect?8:2;
-  addXP(gain); arrangeState.xp += gain;
   if (isCorrect) arrangeState.correct++;
   if (w.id >= 151) setWordStatus(w.id, isCorrect?3:2);
   el("arr-next-btn").style.display="block";
